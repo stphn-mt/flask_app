@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Map
+{% endblock %}
+
+{% block content %}
+    <div id="map" style="width:900px; height:580px; "></div>
+    <br>
+    <!-- Form that will be shown after a map click -->
+    <form id="form-container" method="POST" action="{{ url_for('map') }}" style="display:none;">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.event_name.label }}<br>
+            {{ form.event_name(size=32) }}
+        </div>
+        <div>
+            {{ form.event_time.label }}<br>
+            {{ form.event_time() }}  <!-- Produces a datetime-local input -->
+        </div>
+        <div>
+            {{ form.description.label }}<br>
+            {{ form.description(rows=3) }}
+        </div>
+        {{ form.latitude }}
+        {{ form.longitude }}
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+    </div>
+    <script src="../static/leaf.js"></script>
+    <br>
+    <br>
+{% endblock %}

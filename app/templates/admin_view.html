@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}
+Admin_view
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Admin View</h1>
+
+        <!-- User Table -->
+        <h2>Users</h2>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <!-- Field names for User  -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td> <!-- ORM attribute names -->
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <!-- Data that goes into corresponding field -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Marker Table -->
+        <h2>Markers</h2>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Time</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for marker in markers %}
+                <tr>
+                    <td>{{ marker.id }}</td> <!-- ORM attribute names -->
+                    <td>{{ marker.event_name }}</td>
+                    <td>{{ marker.event_time }}</td>
+                    <td>{{ marker.latitude }}</td>
+                    <td>{{ marker.longitude }}</td>
+                    <td>{{ marker.event_description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+{% endblock %}

@@ -1,0 +1,105 @@
+2025-01-19 23:54:54,863 ERROR: Exception on / [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 40, in index
+    return render_template('index.html', title='Home', form=form,
+                           posts=posts.items, next_url=next_url,
+                           prev_url=prev_url) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/stephentrento/flask_app/app/templates/index.html", line 2, in top-level template code
+    {% import "bootstrap_wtf.html" as wtf %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/base.html", line 43, in top-level template code
+    <a class="nav-link" aria-current="page" href="{{ url_for('map') }}">Logout</a>
+    ^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'map'. Did you mean 'static' instead?
+2025-01-19 23:55:05,092 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:47]
+2025-01-19 23:59:09,979 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:47]
+2025-01-20 00:55:16,819 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 00:56:03,230 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:20:54,773 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:31:39,979 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:31:50,154 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:31:56,746 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:58:05,150 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:58:12,603 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:58:21,247 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 10:59:38,618 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 46, in map
+    if method == "POST":
+       ^^^^^^
+NameError: name 'method' is not defined
+2025-01-20 11:00:45,866 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 11:00:55,021 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 920, in full_dispatch_request
+    return self.finalize_request(rv)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 939, in finalize_request
+    response = self.make_response(rv)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1212, in make_response
+    raise TypeError(
+    ...<3 lines>...
+    )
+TypeError: The view function for 'map' did not return a valid response. The function either returned None or ended without a return statement.
+2025-01-20 11:03:15,397 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 11:05:56,563 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 11:07:08,832 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
+2025-01-20 11:07:51,954 ERROR: Exception on /map [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 52, in map
+    marker = Marker(latitude=lat, longitude=lng, event_name=event_name, event_time=event_time, event_description=event_description)
+             ^^^^^^
+NameError: name 'Marker' is not defined
+2025-01-20 11:08:18,755 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:48]
