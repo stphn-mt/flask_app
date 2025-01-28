@@ -1,0 +1,24 @@
+<div>
+    <h2>Your Events</h2>
+    <ul>
+        {% for event in events %}
+        <li>
+            <strong>{{ event.title }}</strong>
+            <button onclick="toggleOptions({{ event.event_id }})">Select</button>
+            <div id="options-{{ event.id }}" style="display:none;">
+                <a href="{{ url_for('edit_event', event_id=event.event_id) }}">Modify</a>
+                <form action="{{ url_for('delete_event', event_id=event.event_id) }}" method="POST" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+function toggleOptions(eventId) {
+    const optionsDiv = document.getElementById(`options-${eventId}`);
+    optionsDiv.style.display = optionsDiv.style.display === 'none' ? 'block' : 'none';
+}
+</script>

@@ -9,6 +9,26 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import app, db, login
 
+########################################
+# class Request_organiser(db.Model):
+#     wants_to_be_organiser: so.Mapped[bool] = so.mapped_column(nullable=False)
+#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
+#     reason: so.Mapped[str] = so.mapped_column(sa.String(256))
+
+# class Location(db.model):
+#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
+#     address: so.Mapped[str] = so.mapped_column(sa.String(256))
+#     postcode: so.Mapped[str] = so.mapped_column(sa.String(8))
+#     latitude: so.Mapped[float] = so.mapped_column(nullable=False)
+#     longitude: so.Mapped[float] = so.mapped_column(nullable=False)
+
+# Organisation = sa.Table(
+#     'organisation',
+#     db.metadata,
+#     sa.Column('id', sa.Integer, primary_key=True),
+#     sa.Column('name', sa.String)
+# )
+########################################
 
 followers = sa.Table(
     'followers',
@@ -21,22 +41,28 @@ followers = sa.Table(
 
 
 class User(UserMixin, db.Model):
-    __searchable__ = ['username', 'email', 'about_me']  # Fields to index
+    # __searchable__ = ['username', 'email', 'about_me']  # Fields to index
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True) # so.Mapped gives a python data type to the attr, so.mapped_column creates the actual column
+    
+    wants_to_be_organiser: so.Mapped[bool] = so.mapped_column(default=False, nullable=True)
+
     access_level: so.Mapped[int] = so.mapped_column(
         default=0,  # Default to 0 (logged-in user)
         nullable=False
     )
+    organisation = db.Column(db.String(100), nullable=True)
+    
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True,
                                                 unique=True)
     email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True,
                                              unique=True)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256)) #attr can be defined as Optional
+    
     about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
+
     last_seen: so.Mapped[Optional[datetime]] = so.mapped_column(
         default=lambda: datetime.now(timezone.utc))
-    
 
     posts: so.WriteOnlyMapped['Post'] = so.relationship( 
         back_populates='author') #back_populates links Posts.author to User.posts
@@ -118,9 +144,8 @@ class User(UserMixin, db.Model):
 def load_user(id):
     return db.session.get(User, int(id))
 
-
 class Post(db.Model):
-    __searchable__ = ['body']  # Fields to index
+    # __searchable__ = ['body']  # Fields to index
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
@@ -135,15 +160,15 @@ class Post(db.Model):
         return '<Post {}>'.format(self.body)
 
 class Marker(db.Model):
-    __searchable__ = ['event_name', 'event_description']  # Fields to index
-    __tablename__ = "Marker"  # Explicit table name
+    # __searchable__ = ['event_name', 'event_description']  # Fields to index
+    # __tablename__ = "Marker"  # Explicit table name
     
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     latitude: so.Mapped[float] = so.mapped_column(nullable=False)
     longitude: so.Mapped[float] = so.mapped_column(nullable=False)
-    event_name: so.Mapped[str] = so.mapped_column(sa.String(140))
-    event_time: so.Mapped[datetime] = so.mapped_column()
+    event_name: so.Mapped[str] = so.mapped_column(sa.String(140), nullable=True)
+    event_time: so.Mapped[datetime] = so.mapped_column(nullable=True)
     event_description: so.Mapped[str] = so.mapped_column(sa.String(140))
-
+    created_by: so.Mapped[str] = so.mapped_column(db.ForeignKey("user.id"), nullable=True)
     def __repr__(self) -> str:
         return f"<Marker (id={self.id}, latitude={self.latitude}, longitude={self.longitude})>"

@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, \
-        EventForm
+        EventForm, RequestOrganiserForm
 from app.models import User, Post, Marker
 from app.email import send_password_reset_email
 
@@ -16,6 +16,70 @@ def before_request(): # if user is logged in, record the time they log in
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
 
+##################################################
+
+@app.route('/request_organiser', methods=["GET", "POST"])
+@login_required
+def request_organiser():
+    form = RequestOrganiserForm() #get the form to be filled in
+    if form.validate_on_submit(): #If user fills in form properly
+        user = db.session.scalar(sa.select(User).where(User.username == current_user.username)) #get user
+        user.wants_to_be_organiser = True #update status
+        user.organisation = form.organisation.data
+        db.session.commit()
+        flash("Your request has been recieved! Please wait for an admin to respond.")
+        return redirect('index.html')
+    return render_template('request_organiser.html', form=form)
+
+@app.route('/event/<int:event_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_event(event_id):
+    event = Marker.query.get_or_404(event_id)
+    if event.created_by != current_user.user_id and not current_user.access_level==2:
+        abort(403)  # Unauthorized access
+    if request.method == 'POST':
+        event.event_name = request.form['title']
+        event.event_description = request.form['description']
+        db.session.commit()
+        flash('Event updated successfully!', 'success')
+        return redirect(url_for('index'))
+    return render_template('edit_event.html', event=event)
+
+@app.route('/event/<int:event_id>/delete', methods=['POST'])
+@login_required
+def delete_event(event_id):
+    event = Marker.query.get_or_404(event_id)
+    if event.created_by != current_user.user_id and not current_user.access_level==2:
+        abort(403)  # Unauthorized access
+    db.session.delete(event)
+    db.session.commit()
+    flash('Event deleted successfully!', 'success')
+    return redirect(url_for('index'))
+
+@app.route('/user/<int:user_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_user(user_id):
+    if not current_user.access_level==2:
+        abort(403)  # Unauthorized access
+    user = User.query.get_or_404(user_id)
+    if request.method == 'POST':
+        user.username = request.form['username']
+        db.session.commit()
+        flash('User updated successfully!', 'success')
+        return redirect(url_for('admin_view'))
+    return render_template('edit_user.html', user=user)
+
+@app.route('/user/<int:user_id>/delete', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    if not current_user.access_level==2:
+        abort(403)  # Unauthorized access
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    flash('User deleted successfully!', 'success')
+    return redirect(url_for('admin_view'))
+##################################################
 @app.route('/', methods=['GET', 'POST']) #accept data input from webpage
 @app.route('/index', methods=['GET', 'POST']) # accept “/” or “/index” as route
 @login_required
@@ -74,7 +138,7 @@ def api_markers():
     return jsonify(marker_data)  # Return JSON response
 
 
-@app.route('/admin-view', methods=['GET'])
+@app.route('/admin-view')
 def admin_view():
     # Query data using Flask-SQLAlchemy's session
     user_data = User.query.all()  # Fetch all users
@@ -194,13 +258,13 @@ def user(username):
 @login_required
 def edit_profile():
     form = EditProfileForm(current_user.username)
-    if form.validate_on_submit():
+    if form.validate_on_submit(): #If the user changes and submits data on their profile, save their changes
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('edit_profile'))
-    elif request.method == 'GET':
+    elif request.method == 'GET': # if user goes onto the edit_profile page, fill in the form with their current data
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile',

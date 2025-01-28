@@ -35,6 +35,11 @@
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="{{ url_for('explore') }}">Explore</a>
             </li>
+            {% if current_user.access_level==0 %}
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="{{ url_for('request_organiser') }}">Become an Organiser!</a>
+            </li>
+            {% endif %}
           </ul>
           <ul class="navbar-nav mb-2 mb-lg-0">
             {% if current_user.is_anonymous %}
@@ -42,6 +47,10 @@
               <a class="nav-link" aria-current="page" href="{{ url_for('login') }}">Login</a>
             </li>
             {% else %}
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="{{ url_for('user', username=current_user.username) }}">Profile</a>
             </li>

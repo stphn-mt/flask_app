@@ -7,56 +7,30 @@ Admin_view
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Admin View</h1>
-
+        <p> Here you can view all users and events. Use the 'select' button and then click on users/events to delete or modify.</p>
         <!-- User Table -->
-        <h2>Users</h2>
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <!-- Field names for User  -->
-                </tr>
-            </thead>
-            <tbody>
+        <div>
+            <h2>User Management</h2>
+            <ul>
                 {% for user in users %}
-                <tr>
-                    <td>{{ user.id }}</td> <!-- ORM attribute names -->
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.email }}</td>
-                    <!-- Data that goes into corresponding field -->
-                </tr>
+                <li>
+                    <strong>{{ user.username }}</strong> {% if user.access_level==2 %}(Admin){% endif %}
+                    <button onclick="toggleOptions({{ user.user_id }})">Select</button>
+                    <div id="options-{{ user.user_id }}" style="display:none;">
+                        <a href="{{ url_for('edit_user', user_id=user.user_id) }}">Modify</a>
+                        <form action="{{ url_for('delete_user', user_id=user.user_id) }}" method="POST" style="display:inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </div>
+                </li>
                 {% endfor %}
-            </tbody>
-        </table>
-
-        <!-- Marker Table -->
-        <h2>Markers</h2>
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Time</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for marker in markers %}
-                <tr>
-                    <td>{{ marker.id }}</td> <!-- ORM attribute names -->
-                    <td>{{ marker.event_name }}</td>
-                    <td>{{ marker.event_time }}</td>
-                    <td>{{ marker.latitude }}</td>
-                    <td>{{ marker.longitude }}</td>
-                    <td>{{ marker.event_description }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</body>
+            </ul>
+        </div>
+        
+        <script>
+        function toggleOptions(userId) {
+            const optionsDiv = document.getElementById(`options-${userId}`);
+            optionsDiv.style.display = optionsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+        </script>
 {% endblock %}
