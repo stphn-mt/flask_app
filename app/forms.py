@@ -9,7 +9,6 @@ from app import db
 from app.models import User
 
 class RequestOrganiserForm(FlaskForm):
-    organisation = StringField('Organisation')
     reason = StringField('What events would you organise?', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
@@ -19,8 +18,11 @@ class EventForm(FlaskForm):
         'Event Time',
         validators=[DataRequired()],
         format='%Y-%m-%dT%H:%M'  # Format for HTML5 datetime-local input
+    filter_type = StringField('Filters')
     )
     description = TextAreaField('Description', validators=[DataRequired()])
+    address = StringField('Address')
+    postcode = StringField('Postcode')
     latitude = HiddenField('Latitude', render_kw={"id": "latitude"})
     longitude = HiddenField('Longitude', render_kw={"id": "longitude"})
     submit = SubmitField('Submit')

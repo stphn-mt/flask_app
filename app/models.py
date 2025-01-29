@@ -8,26 +8,42 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import app, db, login
+from flask_whooshalchemy import whoosh_index
 
 ########################################
-# class Request_organiser(db.Model):
-#     wants_to_be_organiser: so.Mapped[bool] = so.mapped_column(nullable=False)
-#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#     reason: so.Mapped[str] = so.mapped_column(sa.String(256))
+class Request_organiser(db.Model):
+    user_id: so.Mapped[int] = so.mapped_column(
+        primary_key=True, 
+        sa.ForeignKey("User.id"), 
+        unique=True
+    )
+    reason: so.Mapped[str] = so.mapped_column(sa.String(256))
+    # Relationship to User
+    user: so.WriteOnlyMapped["User"] = so.relationship(
+        "User",
+        back_populates="request_organiser",
+    ) #maps foreign key to User table's id
 
-# class Location(db.model):
-#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#     address: so.Mapped[str] = so.mapped_column(sa.String(256))
-#     postcode: so.Mapped[str] = so.mapped_column(sa.String(8))
-#     latitude: so.Mapped[float] = so.mapped_column(nullable=False)
-#     longitude: so.Mapped[float] = so.mapped_column(nullable=False)
+class Location(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    address: so.Mapped[str] = so.mapped_column(sa.String(256))
+    postcode: so.Mapped[str] = so.mapped_column(sa.String(8))
+    latitude: so.Mapped[float] = so.mapped_column(nullable=False)
+    longitude: so.Mapped[float] = so.mapped_column(nullable=False)
+
+    markers: so.WriteOnlyMapped["Marker"] = so.relationship(
+        "Marker",
+        back_populates="location",
+        lazy="dynamic",  # Enables efficient querying of markers
+    )
 
 # Organisation = sa.Table(
 #     'organisation',
 #     db.metadata,
 #     sa.Column('id', sa.Integer, primary_key=True),
 #     sa.Column('name', sa.String)
-# )
+# ) doesn't work, might have to add extra table just for this
+#  and its not that necessary of a feature anyway
 ########################################
 
 followers = sa.Table(
@@ -37,21 +53,17 @@ followers = sa.Table(
               primary_key=True),
     sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'),
               primary_key=True)
-) #linking table for follwing and followed
+) #linking table for following and followed
 
 
 class User(UserMixin, db.Model):
-    # __searchable__ = ['username', 'email', 'about_me']  # Fields to index
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True) # so.Mapped gives a python data type to the attr, so.mapped_column creates the actual column
-    
-    wants_to_be_organiser: so.Mapped[bool] = so.mapped_column(default=False, nullable=True)
 
     access_level: so.Mapped[int] = so.mapped_column(
         default=0,  # Default to 0 (logged-in user)
         nullable=False
     )
-    organisation = db.Column(db.String(100), nullable=True)
     
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True,
                                                 unique=True)
@@ -75,6 +87,16 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.follower_id == id),
         back_populates='following') #same but for who the user is being followed by
 
+    request_organiser: so.WriteOnlyMapped["RequestOrganiser"] = so.relationship(
+        "RequestOrganiser",
+        back_populates="user",
+        uselist=False,  # This ensures a one-to-one relationship
+    )
+    markers: so.WriteOnlyMapped["Marker"] = so.relationship(
+        "Marker",
+        back_populates="creator",  # Links to the `Marker.creator` relationship
+        lazy="dynamic",           # Enables efficient querying of markers
+    )
     def __repr__(self):
         return '<User {}>'.format(self.username) # provides information in a nice format for each User
 
@@ -145,7 +167,7 @@ def load_user(id):
     return db.session.get(User, int(id))
 
 class Post(db.Model):
-    # __searchable__ = ['body']  # Fields to index
+    __searchable__ = ['body']  # Fields to index
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
@@ -160,15 +182,31 @@ class Post(db.Model):
         return '<Post {}>'.format(self.body)
 
 class Marker(db.Model):
-    # __searchable__ = ['event_name', 'event_description']  # Fields to index
-    # __tablename__ = "Marker"  # Explicit table name
+    __searchable__ = ['event_name', 'event_description', 'user_id', 'filter_type']  # Fields to index
     
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    latitude: so.Mapped[float] = so.mapped_column(nullable=False)
-    longitude: so.Mapped[float] = so.mapped_column(nullable=False)
     event_name: so.Mapped[str] = so.mapped_column(sa.String(140), nullable=True)
     event_time: so.Mapped[datetime] = so.mapped_column(nullable=True)
     event_description: so.Mapped[str] = so.mapped_column(sa.String(140))
-    created_by: so.Mapped[str] = so.mapped_column(db.ForeignKey("user.id"), nullable=True)
+    filter_type: so.Mapped[str] = so.mapped_column(sa.String(60))
+    user_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("User.id"))
+    location_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("Location.id"))
+
     def __repr__(self) -> str:
-        return f"<Marker (id={self.id}, latitude={self.latitude}, longitude={self.longitude})>"
+        return f"<Marker (id={self.id})>"
+    
+    location: so.WriteOnlyMapped["Location"] = so.relationship(
+        "Location",
+        back_populates="markers",
+        foreign_keys="[Marker.location_id]"
+    )
+
+    # Relationship to User
+    creator: so.WriteOnlyMapped["User"] = so.relationship(
+        "User",
+        back_populates="markers",  # Links to the `User.markers` relationship
+        foreign_keys="[Marker.user_id]"
+    )
+    
+
+woosh_index(app, Marker)

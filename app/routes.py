@@ -9,6 +9,7 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
         EventForm, RequestOrganiserForm
 from app.models import User, Post, Marker
 from app.email import send_password_reset_email
+import flask_whooshalchemy
 
 @app.before_request
 def before_request(): # if user is logged in, record the time they log in
@@ -18,24 +19,35 @@ def before_request(): # if user is logged in, record the time they log in
 
 ##################################################
 
+
 @app.route('/request_organiser', methods=["GET", "POST"])
 @login_required
 def request_organiser():
-    form = RequestOrganiserForm() #get the form to be filled in
-    if form.validate_on_submit(): #If user fills in form properly
-        user = db.session.scalar(sa.select(User).where(User.username == current_user.username)) #get user
-        user.wants_to_be_organiser = True #update status
-        user.organisation = form.organisation.data
+    form = RequestOrganiserForm() #get form
+
+    if form.validate_on_submit():
+        user = db.session.scalar(sa.select(User).where(User.username == current_user.username))
+
+        # Check if user already made a request
+        existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
+        if existing_request:
+            flash("You have already submitted a request.")
+            return redirect(url_for('index'))
+
+        user_requested = Request_organiser(user_id=user.id, reason=form.reason.data)
+        db.session.add(user_requested)
         db.session.commit()
-        flash("Your request has been recieved! Please wait for an admin to respond.")
-        return redirect('index.html')
+
+        flash("Your request has been received! Please wait for an admin to respond.")
+        return redirect(url_for('index'))
+
     return render_template('request_organiser.html', form=form)
 
 @app.route('/event/<int:event_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_event(event_id):
     event = Marker.query.get_or_404(event_id)
-    if event.created_by != current_user.user_id and not current_user.access_level==2:
+    if event.created_by != current_user.id and not current_user.access_level==2:
         abort(403)  # Unauthorized access
     if request.method == 'POST':
         event.event_name = request.form['title']
@@ -112,10 +124,34 @@ def map():
         event_description = form.description.data
         latitude = form.latitude.data
         longitude = form.longitude.data
-        marker = Marker(latitude=latitude, longitude=longitude, event_name=event_name, event_time=event_time, event_description=event_description)
+        filter_type = form.filter_type.data  
+        address = form.address.data
+        postcode = form.address.data
+        # Check if location already exists
+        location = Location.query.filter_by(latitude=latitude, longitude=longitude).first()
+        
+        if not location:
+            location = Location(
+                address=address,  # ADDRESS AND POSTCODE NEED TO BE FOUND
+                postcode=postcode,
+                latitude=latitude,
+                longitude=longitude
+            )
+            db.session.add(location)
+            db.session.flush()  # ensure location id is assigned before using it
+
+        # Create and store new marker
+        marker = Marker(
+            event_name=event_name,
+            event_time=event_time,
+            event_description=event_description,
+            filter_type=filter_type,
+            user_id=current_user.id,  # Assign marker to logged-in user
+            location_id=location.id   # Assign marker to location
+        )
+        
         db.session.add(marker)
         db.session.commit()
-        flash("your marker was added")
         return render_template('map.html', form=form)
     return render_template('map.html', form=form)
 
@@ -123,12 +159,15 @@ def map():
 
 @app.route('/api/markers')
 def api_markers():
-    markers = Marker.query.all()  # Fetch all markers from the database
-    # Convert markers to a list of dictionaries for easy JSON conversion
+    query = request.args.get('query')  # Get the search query from the request
+    if query:
+        markers = Marker.query.whoosh_search(query).all()  # Perform full-text search
+    else:
+        markers = Marker.query.all()  # Fetch all markers if no search query
     marker_data = [
         {
-            'latitude': marker.latitude,
-            'longitude': marker.longitude,
+            'latitude': marker.location.latitude,
+            'longitude': marker.location.longitude,
             'event_name': marker.event_name,
             'event_time': marker.event_time,
             'description': marker.event_description
@@ -140,7 +179,6 @@ def api_markers():
 
 @app.route('/admin-view')
 def admin_view():
-    # Query data using Flask-SQLAlchemy's session
     user_data = User.query.all()  # Fetch all users
     marker_data = Marker.query.all()  # Fetch all markers
 

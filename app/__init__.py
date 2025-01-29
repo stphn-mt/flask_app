@@ -8,11 +8,13 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_moment import Moment
 from config import Config
+from flask_whooshalchemy import WhooshAlchemy
 
 #create an instance of flask app with addons
 app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
+whoosh = WhooshAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'

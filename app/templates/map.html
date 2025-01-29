@@ -5,6 +5,15 @@ Map
 {% endblock %}
 
 {% block content %}
+    <h4>Search</h4>
+        <form class="form-inline" method="GET" action="api/markers">
+            <div class="form-group">
+                <label for="query">Name</label>
+                <input type="text" class="form-control" name="query" id="query">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
     <div id="map" style="width:900px; height:580px; "></div>
     <br>
     <!-- Form that will be shown after a map click -->
@@ -21,6 +30,18 @@ Map
         <div>
             {{ form.description.label }}<br>
             {{ form.description(rows=3) }}
+        </div>
+        <div>
+            {{ form.filter_type.label }}<br>
+            {{ form.filter_type() }}
+        </div>
+        <div>
+            {{ form.address.label }}<br>
+            {{ form.address() }}
+        </div>
+        <div>
+            {{ form.postcode.label }}<br>
+            {{ form.postcode() }}
         </div>
         {{ form.latitude }}
         {{ form.longitude }}

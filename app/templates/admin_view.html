@@ -16,9 +16,28 @@ Admin_view
                 <li>
                     <strong>{{ user.username }}</strong> {% if user.access_level==2 %}(Admin){% endif %}
                     <button onclick="toggleOptions({{ user.user_id }})">Select</button>
-                    <div id="options-{{ user.user_id }}" style="display:none;">
-                        <a href="{{ url_for('edit_user', user_id=user.user_id) }}">Modify</a>
-                        <form action="{{ url_for('delete_user', user_id=user.user_id) }}" method="POST" style="display:inline;">
+                    <div id="options-{{ user.id }}" style="display:none;">
+                        <a href="{{ url_for('edit_user', user_id=user.id) }}">Modify</a>
+                        <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- note - can use current_user or load_user to get id more cleanly??-->
+        <!-- Marker Table -->
+        <div>
+            <h2>Event Management</h2>
+            <ul>
+                {% for marker in markers %}
+                <li>
+                    <strong>{{ marker.event_name }}</strong> {% if user.access_level==2 %}(Admin){% endif %}
+                    <button onclick="toggleOptions({{ marker.id }})">Select</button>
+                    <div id="options-{{ marker.id }}" style="display:none;">
+                        <a href="{{ url_for('edit_event', event_id=marker.id) }}">Modify</a>
+                        <form action="{{ url_for('delete_event', user_id=marker.id) }}" method="POST" style="display:inline;">
                             <button type="submit">Delete</button>
                         </form>
                     </div>
