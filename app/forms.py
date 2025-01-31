@@ -17,7 +17,7 @@ class EventForm(FlaskForm):
     event_time = DateTimeLocalField(
         'Event Time',
         validators=[DataRequired()],
-        format='%Y-%m-%dT%H:%M'  # Format for HTML5 datetime-local input
+        format='%Y-%m-%dT%H:%M',  # Format for HTML5 datetime-local input
     filter_type = StringField('Filters')
     )
     description = TextAreaField('Description', validators=[DataRequired()])

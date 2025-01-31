@@ -7,34 +7,36 @@ import sqlalchemy.orm as so
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
-from app import app, db, login
-from flask_whooshalchemy import whoosh_index
-
+from app import app, db, login, search
+# from flask_msearch import Search
 ########################################
 class Request_organiser(db.Model):
-    user_id: so.Mapped[int] = so.mapped_column(
+    __tablename__ = "request_organiser"
+    User_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey("User.id"),
         primary_key=True, 
-        sa.ForeignKey("User.id"), 
         unique=True
     )
     reason: so.Mapped[str] = so.mapped_column(sa.String(256))
     # Relationship to User
-    user: so.WriteOnlyMapped["User"] = so.relationship(
+    User: so.Mapped['User'] = so.relationship(
         "User",
         back_populates="request_organiser",
+        # lazy="select"
     ) #maps foreign key to User table's id
 
 class Location(db.Model):
+    __tablename__ = "Location"
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     address: so.Mapped[str] = so.mapped_column(sa.String(256))
     postcode: so.Mapped[str] = so.mapped_column(sa.String(8))
     latitude: so.Mapped[float] = so.mapped_column(nullable=False)
     longitude: so.Mapped[float] = so.mapped_column(nullable=False)
 
-    markers: so.WriteOnlyMapped["Marker"] = so.relationship(
+    markers: so.Mapped['Marker'] = so.relationship(
         "Marker",
-        back_populates="location",
-        lazy="dynamic",  # Enables efficient querying of markers
+        back_populates="Location",
+        # lazy="dynamic",  # Enables efficient querying of Markers
     )
 
 # Organisation = sa.Table(
@@ -49,19 +51,19 @@ class Location(db.Model):
 followers = sa.Table(
     'followers',
     db.metadata,
-    sa.Column('follower_id', sa.Integer, sa.ForeignKey('user.id'),
+    sa.Column('follower_id', sa.Integer, sa.ForeignKey('User.id'),
               primary_key=True),
-    sa.Column('followed_id', sa.Integer, sa.ForeignKey('user.id'),
+    sa.Column('followed_id', sa.Integer, sa.ForeignKey('User.id'),
               primary_key=True)
 ) #linking table for following and followed
 
 
 class User(UserMixin, db.Model):
-
+    __tablename__ = "User"
     id: so.Mapped[int] = so.mapped_column(primary_key=True) # so.Mapped gives a python data type to the attr, so.mapped_column creates the actual column
 
     access_level: so.Mapped[int] = so.mapped_column(
-        default=0,  # Default to 0 (logged-in user)
+        default=0,  # Default to 0 (logged-in User)
         nullable=False
     )
     
@@ -79,26 +81,26 @@ class User(UserMixin, db.Model):
     posts: so.WriteOnlyMapped['Post'] = so.relationship( 
         back_populates='author') #back_populates links Posts.author to User.posts
     following: so.WriteOnlyMapped['User'] = so.relationship(
-        secondary=followers, primaryjoin=(followers.c.follower_id == id), # establish link between User and Follower tables, where the id matches (all the users this current user follows)
-        secondaryjoin=(followers.c.followed_id == id), #links followers back to users. identifies all users who are followed by the current user
-        back_populates='followers') #links User.following to Follower.followers (who the user is following)
+        secondary=followers, primaryjoin=(followers.c.follower_id == id), # establish link between User and Follower tables, where the id matches (all the Users this current User follows)
+        secondaryjoin=(followers.c.followed_id == id), #links followers back to Users. identifies all Users who are followed by the current User
+        back_populates='followers') #links User.following to Follower.followers (who the User is following)
     followers: so.WriteOnlyMapped['User'] = so.relationship(
         secondary=followers, primaryjoin=(followers.c.followed_id == id),
         secondaryjoin=(followers.c.follower_id == id),
-        back_populates='following') #same but for who the user is being followed by
+        back_populates='following') #same but for who the User is being followed by
 
-    request_organiser: so.WriteOnlyMapped["RequestOrganiser"] = so.relationship(
-        "RequestOrganiser",
-        back_populates="user",
-        uselist=False,  # This ensures a one-to-one relationship
+    request_organiser: so.Mapped["Request_organiser"] = so.relationship(
+        "Request_organiser",
+        back_populates="User",
+        # uselist=False,  # This ensures a one-to-one relationship
     )
-    markers: so.WriteOnlyMapped["Marker"] = so.relationship(
+    Markers: so.Mapped["Marker"] = so.relationship(
         "Marker",
         back_populates="creator",  # Links to the `Marker.creator` relationship
-        lazy="dynamic",           # Enables efficient querying of markers
+        # lazy="dynamic",           # Enables efficient querying of Markers
     )
     def __repr__(self):
-        return '<User {}>'.format(self.username) # provides information in a nice format for each User
+        return '<User {}>'.format(self.Username) # provides information in a nice format for each User
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password) # applies a hashing algorithm to encrypt passwords
@@ -110,16 +112,16 @@ class User(UserMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}' #provides an automatic avatar
 
-    def follow(self, user):
-        if not self.is_following(user):
-            self.following.add(user)
+    def follow(self, User):
+        if not self.is_following(User):
+            self.following.add(User)
 
-    def unfollow(self, user):
-        if self.is_following(user):
-            self.following.remove(user)
+    def unfollow(self, User):
+        if self.is_following(User):
+            self.following.remove(User)
 
-    def is_following(self, user):
-        query = self.following.select().where(User.id == user.id)
+    def is_following(self, User):
+        query = self.following.select().where(User.id == User.id)
         return db.session.scalar(query) is not None
 
     def followers_count(self):
@@ -163,7 +165,7 @@ class User(UserMixin, db.Model):
 
 
 @login.user_loader
-def load_user(id):
+def load_User(id):
     return db.session.get(User, int(id))
 
 class Post(db.Model):
@@ -178,35 +180,38 @@ class Post(db.Model):
 
     author: so.Mapped[User] = so.relationship(back_populates='posts')
 
-    def __repr__(self): #provides a user-friendly description of each record in the table
+    def __repr__(self): #provides a User-friendly description of each record in the table
         return '<Post {}>'.format(self.body)
 
 class Marker(db.Model):
-    __searchable__ = ['event_name', 'event_description', 'user_id', 'filter_type']  # Fields to index
+    __tablename__ = "Marker"
+    __searchable__ = ['event_name', 'event_description', 'User_id', 'filter_type']  # Fields to index
     
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     event_name: so.Mapped[str] = so.mapped_column(sa.String(140), nullable=True)
     event_time: so.Mapped[datetime] = so.mapped_column(nullable=True)
     event_description: so.Mapped[str] = so.mapped_column(sa.String(140))
     filter_type: so.Mapped[str] = so.mapped_column(sa.String(60))
-    user_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("User.id"))
-    location_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("Location.id"))
+    User_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("User.id"))
+    Location_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("Location.id"))
 
     def __repr__(self) -> str:
         return f"<Marker (id={self.id})>"
     
-    location: so.WriteOnlyMapped["Location"] = so.relationship(
+    Location: so.Mapped["Location"] = so.relationship(
         "Location",
         back_populates="markers",
-        foreign_keys="[Marker.location_id]"
+        foreign_keys="[Marker.Location_id]"
     )
 
     # Relationship to User
-    creator: so.WriteOnlyMapped["User"] = so.relationship(
+    creator: so.Mapped["User"] = so.relationship(
         "User",
-        back_populates="markers",  # Links to the `User.markers` relationship
-        foreign_keys="[Marker.user_id]"
+        back_populates="Markers",  # Links to the `User.Markers` relationship
+        foreign_keys="[Marker.User_id]"
     )
-    
 
-woosh_index(app, Marker)
+# Set up models
+with app.app_context():
+    db.create_all()
+    search.create_index()

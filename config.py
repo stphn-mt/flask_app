@@ -14,4 +14,6 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['your-email@example.com']
     POSTS_PER_PAGE = 25
-    WHOOSH_BASE = os.path.join(basedir, 'whoosh_index')  # Directory for search index
+    MSEARCH_INDEX_NAME = 'msearch'  # Name of the index directory
+    MSEARCH_BACKEND = 'whoosh'  # Can also be 'sphinx' or 'elasticsearch'
+    MSEARCH_ENABLE = True

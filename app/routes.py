@@ -9,7 +9,7 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
         EventForm, RequestOrganiserForm
 from app.models import User, Post, Marker
 from app.email import send_password_reset_email
-import flask_whooshalchemy
+import flask_msearch
 
 @app.before_request
 def before_request(): # if user is logged in, record the time they log in
@@ -161,7 +161,7 @@ def map():
 def api_markers():
     query = request.args.get('query')  # Get the search query from the request
     if query:
-        markers = Marker.query.whoosh_search(query).all()  # Perform full-text search
+        markers = Marker.query.msearch("search term", fields=['name', 'description']).all()
     else:
         markers = Marker.query.all()  # Fetch all markers if no search query
     marker_data = [
