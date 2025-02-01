@@ -194,7 +194,7 @@ class Marker(db.Model):
     filter_type: so.Mapped[str] = so.mapped_column(sa.String(60))
     User_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("User.id"))
     Location_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("Location.id"))
-
+    
     def __repr__(self) -> str:
         return f"<Marker (id={self.id})>"
     

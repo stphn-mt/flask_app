@@ -19,7 +19,6 @@ def before_request(): # if user is logged in, record the time they log in
 
 ##################################################
 
-
 @app.route('/request_organiser', methods=["GET", "POST"])
 @login_required
 def request_organiser():
