@@ -11,7 +11,7 @@ from app import app, db, login, search
 # from flask_msearch import Search
 ########################################
 class Request_organiser(db.Model):
-    __tablename__ = "request_organiser"
+    __tablename__ = "Request_organiser"
     User_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey("User.id"),
         primary_key=True, 

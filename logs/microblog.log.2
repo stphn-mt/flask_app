@@ -1,0 +1,125 @@
+2025-01-31 22:28:07,560 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 32, in request_organiser
+    existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
+                                                   ^^^^^^^^^^^^^^^^^
+NameError: name 'Request_organiser' is not defined. Did you mean: 'request_organiser'?
+2025-01-31 22:28:16,222 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:28:28,909 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 32, in request_organiser
+    existing_request = db.session.scalar(sa.select(request_organiser).where(Request_organiser.user_id == user.id))
+                                         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/_selectable_constructors.py", line 485, in select
+    return Select(*entities)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/selectable.py", line 5268, in __init__
+    coercions.expect(
+    ~~~~~~~~~~~~~~~~^
+        roles.ColumnsClauseRole, ent, apply_propagate_attrs=self
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/coercions.py", line 332, in expect
+    return lambdas.LambdaElement(
+           ~~~~~~~~~~~~~~~~~~~~~^
+        element,
+        ^^^^^^^^
+    ...<2 lines>...
+        apply_propagate_attrs=apply_propagate_attrs,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 213, in __init__
+    rec = self._retrieve_tracker_rec(fn, apply_propagate_attrs, opts)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 229, in _retrieve_tracker_rec
+    tracker = AnalyzedCode.get(
+        fn,
+        self,
+        opts,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 753, in get
+    cls._fns[fn.__code__] = analyzed = AnalyzedCode(
+                                       ~~~~~~~~~~~~^
+        fn, lambda_element, lambda_kw, **kw
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 795, in __init__
+    self._setup_additional_closure_trackers(fn, lambda_element, opts)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 863, in _setup_additional_closure_trackers
+    analyzed_function = AnalyzedFunction(
+        self,
+    ...<2 lines>...
+        fn,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 1129, in __init__
+    self._instrument_and_run_function(lambda_element)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 1199, in _instrument_and_run_function
+    self.expr = lambda_element._invoke_user_fn(tracker_instrumented_fn)
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 425, in _invoke_user_fn
+    return fn()  # type: ignore[no-any-return]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 282, in decorated_view
+    if request.method in EXEMPT_METHODS or current_app.config.get("LOGIN_DISABLED"):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/operators.py", line 650, in __contains__
+    return self.operate(contains, other)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/lambdas.py", line 1349, in operate
+    return op(elem, *other, **kwargs)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/operators.py", line 650, in __contains__
+    return self.operate(contains, other)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 1515, in operate
+    return op(self.comparator, *other, **kwargs)  # type: ignore[no-any-return]  # noqa: E501
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/operators.py", line 650, in __contains__
+    return self.operate(contains, other)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/type_api.py", line 197, in operate
+    return op_fn(self.expr, op, *other, **addtl_kw)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/default_comparator.py", line 249, in _unsupported_impl
+    raise NotImplementedError(
+        "Operator '%s' is not supported on this expression" % op.__name__
+    )
+NotImplementedError: Operator 'contains' is not supported on this expression
+2025-01-31 22:35:21,418 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:36:58,313 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:37:09,501 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:37:19,766 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:37:44,182 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:38:55,225 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:39:04,051 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:39:12,709 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:42:50,497 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:43:50,057 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:44:10,712 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:44:58,813 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:45:19,334 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:45:42,957 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-01-31 22:45:53,256 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

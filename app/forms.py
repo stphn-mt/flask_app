@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    TextAreaField, HiddenField
+    TextAreaField, HiddenField, SelectField
 from wtforms.fields import DateTimeLocalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, \
     Length
@@ -18,8 +18,8 @@ class EventForm(FlaskForm):
         'Event Time',
         validators=[DataRequired()],
         format='%Y-%m-%dT%H:%M',  # Format for HTML5 datetime-local input
-    filter_type = StringField('Filters')
     )
+    filter_type = SelectField('Filters', choices=[('sport', 'sport'), ('club', 'club'), ('support', 'support')])
     description = TextAreaField('Description', validators=[DataRequired()])
     address = StringField('Address')
     postcode = StringField('Postcode')

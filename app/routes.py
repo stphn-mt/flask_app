@@ -7,7 +7,7 @@ from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, \
         EventForm, RequestOrganiserForm
-from app.models import User, Post, Marker
+from app.models import User, Post, Marker, Location, Request_organiser
 from app.email import send_password_reset_email
 import flask_msearch
 
@@ -29,7 +29,7 @@ def request_organiser():
         user = db.session.scalar(sa.select(User).where(User.username == current_user.username))
 
         # Check if user already made a request
-        existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
+        existing_request = db.session.scalar(sa.select(request_organiser).where(Request_organiser.user_id == user.id))
         if existing_request:
             flash("You have already submitted a request.")
             return redirect(url_for('index'))
@@ -146,8 +146,8 @@ def map():
             event_time=event_time,
             event_description=event_description,
             filter_type=filter_type,
-            user_id=current_user.id,  # Assign marker to logged-in user
-            location_id=location.id   # Assign marker to location
+            User_id=current_user.id,  # Assign marker to logged-in user
+            Location_id=location.id   # Assign marker to location
         )
         
         db.session.add(marker)
@@ -159,22 +159,26 @@ def map():
 
 @app.route('/api/markers')
 def api_markers():
-    query = request.args.get('query')  # Get the search query from the request
-    if query:
-        markers = Marker.query.msearch("search term", fields=['name', 'description']).all()
-    else:
-        markers = Marker.query.all()  # Fetch all markers if no search query
-    marker_data = [
-        {
-            'latitude': marker.location.latitude,
-            'longitude': marker.location.longitude,
-            'event_name': marker.event_name,
-            'event_time': marker.event_time,
-            'description': marker.event_description
-        }
-        for marker in markers
-    ]
-    return jsonify(marker_data)  # Return JSON response
+    try:
+        query = request.args.get('query')  # Get the search query from the request
+        if query:
+            markers = Marker.query.msearch('search', fields=['event_name', 'event_description']).all()
+        else:
+            markers = Marker.query.all()  # Fetch all markers if no search query
+
+        marker_data = [
+            {
+                'latitude': marker.Location.latitude,
+                'longitude': marker.Location.longitude,
+                'event_name': marker.event_name,
+                'event_time': marker.event_time,
+                'description': marker.event_description
+            }
+            for marker in markers
+        ]
+        return jsonify(marker_data)  # Return JSON response
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500  # Return error message if an exception occurs
 
 
 @app.route('/admin-view')
