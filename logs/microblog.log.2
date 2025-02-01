@@ -1,23 +1,4 @@
-2025-01-31 22:28:07,560 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 32, in request_organiser
-    existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
-                                                   ^^^^^^^^^^^^^^^^^
-NameError: name 'Request_organiser' is not defined. Did you mean: 'request_organiser'?
-2025-01-31 22:28:16,222 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:28:28,909 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-01 11:53:53,731 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -108,18 +89,42 @@ Traceback (most recent call last):
         "Operator '%s' is not supported on this expression" % op.__name__
     )
 NotImplementedError: Operator 'contains' is not supported on this expression
-2025-01-31 22:35:21,418 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:36:58,313 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:37:09,501 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:37:19,766 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:37:44,182 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:38:55,225 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:39:04,051 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:39:12,709 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:42:50,497 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:43:50,057 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:44:10,712 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:44:58,813 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:45:19,334 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:45:42,957 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:45:53,256 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 12:05:30,652 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 12:05:40,552 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 32, in request_organiser
+    existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'Request_organiser' has no attribute 'user_id'. Did you mean: 'User_id'?
+2025-02-01 12:06:26,586 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 12:06:36,317 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 32, in request_organiser
+    existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'Request_organiser' has no attribute 'user_id'. Did you mean: 'User_id'?
+2025-02-01 12:06:45,664 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

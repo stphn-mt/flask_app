@@ -6,25 +6,48 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-//////////////////////
+// //////////////////////////////
 // This should work now with the data passed from Flask
 // Fetch marker data from the Flask API
-fetch('/api/markers') // GET http request asynchronously from view function '/api/markers'. returns Promise
-.then(response => response.json())  // 
-.then(data => {
-    // For each marker data, add a marker to the map
-    data.forEach(marker => { 
-        var markerInstance = L.marker([marker.latitude, marker.longitude]).addTo(map);
-        markerInstance.bindPopup(`
-            <b>${marker.event_name}</b><br>
-            Time: ${marker.event_time}<br>
-            ${marker.description}
-        `);
-        markerInstance.bindTooltip(marker.event_name, marker.event_description, marker.event_time, { permanent: false });
-    });
-})
-.catch(error => console.error('Error fetching markers:', error));
-//////////////////////////
+function fetchMarkers(query = "") {
+    let url = "/api/markers";
+    if (query) {
+        url += `?query=${encodeURIComponent(query)}`;
+    }
+
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);  // Clear existing markers
+            }
+        });
+
+        data.forEach(marker => {
+            var markerInstance = L.marker([marker.latitude, marker.longitude]).addTo(map);
+            markerInstance.bindPopup(`
+                <b>${marker.event_name}</b><br>
+                Time: ${marker.event_time}<br>
+                ${marker.description}
+            `);
+        });
+    })
+    .catch(error => console.error('Error fetching markers:', error));
+}
+
+// Call fetchMarkers() on page load to display all markers
+fetchMarkers();
+
+// Handle form submission
+document.querySelector('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const query = document.getElementById('query').value;
+    fetchMarkers(query);
+}); // GET http request asynchronously from view function '/api/markers'. returns Promise
+
+// //////////////////////////////
+
 
 // Variable to store the current marker
 var currentMarker = null;

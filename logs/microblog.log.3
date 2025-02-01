@@ -1,4 +1,4 @@
-2025-01-31 22:13:16,566 ERROR: Exception on /request_organiser [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-01 10:54:59,136 ERROR: Exception on /api/markers [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -9,11 +9,26 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 44, in request_organiser
-    return render_template('request_organiser.html', form=form)
+  File "/Users/stephentrento/flask_app/app/routes.py", line 169, in api_markers
+    'latitude': marker.location.latitude,
+                ^^^^^^^^^^^^^^^
+AttributeError: 'Marker' object has no attribute 'location'. Did you mean: 'Location'?
+2025-02-01 10:55:39,884 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 11:27:39,115 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 11:29:51,531 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 11:30:07,468 ERROR: Exception on /admin-view [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 186, in admin_view
+    return render_template('admin_view.html', users=user_data, markers=marker_data)
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
     return _render(app, template, context)
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
@@ -23,103 +38,19 @@ Traceback (most recent call last):
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
     raise rewrite_traceback_stack(source=source)
-  File "/Users/stephentrento/flask_app/app/templates/request_organiser.html", line 2, in top-level template code
-    {% import "bootstrap_wtf.html" as wtf %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 1, in top-level template code
+    {% extends "base.html" %}
   File "/Users/stephentrento/flask_app/app/templates/base.html", line 72, in top-level template code
     {% block content %}{% endblock %}
     ^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/request_organiser.html", line 9, in block 'content'
-    {{ wtf.quick_form(req_form) }}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/runtime.py", line 784, in _invoke
-    rv = self._func(*arguments)
-  File "/Users/stephentrento/flask_app/app/templates/bootstrap_wtf.html", line 53, in template
-    {{ form.hidden_tag() }}
+  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 36, in block 'content'
+    <strong>{{ marker.event_name }}</strong> {% if user.access_level==2 %}(Admin){% endif %}
+    ^^^^^
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
     return getattr(obj, attribute)
-jinja2.exceptions.UndefinedError: 'req_form' is undefined
-2025-01-31 22:17:54,428 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:18:01,599 ERROR: Exception on /request_organiser [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 44, in request_organiser
-    return render_template('request_organiser.html', form=form)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/stephentrento/flask_app/app/templates/request_organiser.html", line 2, in top-level template code
-    {% import "bootstrap_wtf.html" as wtf %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/base.html", line 72, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/request_organiser.html", line 9, in block 'content'
-    {{ wtf.quick_form(req_form) }}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/runtime.py", line 784, in _invoke
-    rv = self._func(*arguments)
-  File "/Users/stephentrento/flask_app/app/templates/bootstrap_wtf.html", line 53, in template
-    {{ form.hidden_tag() }}
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
-    return getattr(obj, attribute)
-jinja2.exceptions.UndefinedError: 'req_form' is undefined
-2025-01-31 22:18:12,494 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:19:56,524 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 32, in request_organiser
-    existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
-                                                   ^^^^^^^^^^^^^^^^^
-NameError: name 'Request_organiser' is not defined. Did you mean: 'request_organiser'?
-2025-01-31 22:21:29,782 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:21:43,980 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:23:23,252 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:26:24,326 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-01-31 22:26:48,657 ERROR: Exception on /request_organiser [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 32, in request_organiser
-    existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.user_id == user.id))
-                                                   ^^^^^^^^^^^^^^^^^
-NameError: name 'Request_organiser' is not defined. Did you mean: 'request_organiser'?
-2025-01-31 22:27:50,344 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+jinja2.exceptions.UndefinedError: 'user' is undefined
+2025-02-01 11:33:38,942 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 11:34:30,248 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 11:47:14,478 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 11:51:39,763 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 11:52:25,895 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

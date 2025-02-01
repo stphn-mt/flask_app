@@ -1,4 +1,4 @@
-2025-02-01 10:54:59,136 ERROR: Exception on /api/markers [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-01 12:52:08,128 ERROR: Exception on /user/1/edit [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -9,45 +9,13 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 169, in api_markers
-    'latitude': marker.location.latitude,
-                ^^^^^^^^^^^^^^^
-AttributeError: 'Marker' object has no attribute 'location'. Did you mean: 'Location'?
-2025-02-01 10:55:39,884 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:27:39,115 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:29:51,531 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:30:07,468 ERROR: Exception on /admin-view [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 186, in admin_view
-    return render_template('admin_view.html', users=user_data, markers=marker_data)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 1, in top-level template code
-    {% extends "base.html" %}
-  File "/Users/stephentrento/flask_app/app/templates/base.html", line 72, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 36, in block 'content'
-    <strong>{{ marker.event_name }}</strong> {% if user.access_level==2 %}(Admin){% endif %}
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 75, in edit_user
+    abort(403)  # Unauthorized access
     ^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
-    return getattr(obj, attribute)
-jinja2.exceptions.UndefinedError: 'user' is undefined
-2025-02-01 11:33:38,942 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:34:30,248 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+NameError: name 'abort' is not defined
+2025-02-01 12:53:49,506 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 12:55:22,061 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-01 12:59:02,974 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

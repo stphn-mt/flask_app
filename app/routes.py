@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
-from flask import render_template, flash, redirect, url_for, request, g, jsonify
+from flask import render_template, flash, redirect, url_for, request, g, jsonify, abort
 from flask_login import login_user, logout_user, current_user, login_required
 import sqlalchemy as sa
 from app import app, db
@@ -29,12 +29,12 @@ def request_organiser():
         user = db.session.scalar(sa.select(User).where(User.username == current_user.username))
 
         # Check if user already made a request
-        existing_request = db.session.scalar(sa.select(request_organiser).where(Request_organiser.user_id == user.id))
+        existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.User_id == user.id))
         if existing_request:
             flash("You have already submitted a request.")
             return redirect(url_for('index'))
 
-        user_requested = Request_organiser(user_id=user.id, reason=form.reason.data)
+        user_requested = Request_organiser(User_id=user.id, reason=form.reason.data)
         db.session.add(user_requested)
         db.session.commit()
 
@@ -160,11 +160,11 @@ def map():
 @app.route('/api/markers')
 def api_markers():
     try:
-        query = request.args.get('query')  # Get the search query from the request
+        query = request.args.get('query', '')  # Get query, default to empty string
         if query:
-            markers = Marker.query.msearch('search', fields=['event_name', 'event_description']).all()
+            markers = Marker.query.msearch(query, fields=['event_name', 'event_description']).all()
         else:
-            markers = Marker.query.all()  # Fetch all markers if no search query
+            markers = Marker.query.all()
 
         marker_data = [
             {
@@ -176,10 +176,10 @@ def api_markers():
             }
             for marker in markers
         ]
-        return jsonify(marker_data)  # Return JSON response
+        return jsonify(marker_data)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500  # Return error message if an exception occurs
-
+        print(f"Error: {str(e)}")  # Log error to terminal
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/admin-view')
 def admin_view():
