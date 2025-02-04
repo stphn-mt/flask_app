@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% import "bootstrap_wtf.html" as wtf %}
 {% block title %}
 Map
 {% endblock %}
@@ -18,36 +18,7 @@ Map
     <br>
     <!-- Form that will be shown after a map click -->
     <form id="form-container" method="POST" action="{{ url_for('map') }}" style="display:none;">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.event_name.label }}<br>
-            {{ form.event_name(size=32) }}
-        </div>
-        <div>
-            {{ form.event_time.label }}<br>
-            {{ form.event_time() }}  <!-- Produces a datetime-local input -->
-        </div>
-        <div>
-            {{ form.description.label }}<br>
-            {{ form.description(rows=3) }}
-        </div>
-        <div>
-            {{ form.filter_type.label }}<br>
-            {{ form.filter_type() }}
-        </div>
-        <div>
-            {{ form.address.label }}<br>
-            {{ form.address() }}
-        </div>
-        <div>
-            {{ form.postcode.label }}<br>
-            {{ form.postcode() }}
-        </div>
-        {{ form.latitude }}
-        {{ form.longitude }}
-        <div>
-            {{ form.submit() }}
-        </div>
+        {{ wtf.quick_form(form) }}
     </form>
     </div>
     <script src="../static/leaf.js"></script>

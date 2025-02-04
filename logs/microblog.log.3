@@ -1,4 +1,4 @@
-2025-02-01 10:54:59,136 ERROR: Exception on /api/markers [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-04 21:19:07,733 ERROR: Exception on /admin-view [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -9,25 +9,7 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 169, in api_markers
-    'latitude': marker.location.latitude,
-                ^^^^^^^^^^^^^^^
-AttributeError: 'Marker' object has no attribute 'location'. Did you mean: 'Location'?
-2025-02-01 10:55:39,884 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:27:39,115 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:29:51,531 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:30:07,468 ERROR: Exception on /admin-view [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 186, in admin_view
+  File "/Users/stephentrento/flask_app/app/routes.py", line 199, in admin_view
     return render_template('admin_view.html', users=user_data, markers=marker_data)
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
     return _render(app, template, context)
@@ -40,17 +22,108 @@ Traceback (most recent call last):
     raise rewrite_traceback_stack(source=source)
   File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 1, in top-level template code
     {% extends "base.html" %}
-  File "/Users/stephentrento/flask_app/app/templates/base.html", line 72, in top-level template code
+  File "/Users/stephentrento/flask_app/app/templates/base.html", line 76, in top-level template code
     {% block content %}{% endblock %}
     ^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 36, in block 'content'
-    <strong>{{ marker.event_name }}</strong> {% if user.access_level==2 %}(Admin){% endif %}
-    ^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
-    return getattr(obj, attribute)
-jinja2.exceptions.UndefinedError: 'user' is undefined
-2025-02-01 11:33:38,942 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:34:30,248 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:47:14,478 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:51:39,763 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-01 11:52:25,895 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 61, in block 'content'
+    <form action="{{ url_for('edit_event', event_id=marker.id) }}" method="POST">
+    
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'edit_event' with values ['event_id']. Did you mean 'edit_profile' instead?
+2025-02-04 21:29:50,359 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-04 21:29:55,875 ERROR: Exception on /admin-view [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 199, in admin_view
+    return render_template('admin_view.html', users=user_data, markers=marker_data)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/Users/stephentrento/flask_app/app/templates/base.html", line 76, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 61, in block 'content'
+    <form action="{{ url_for('edit_event', event_id=marker.id) }}" method="POST">
+    
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'edit_event' with values ['event_id']. Did you mean 'edit_profile' instead?
+2025-02-04 21:30:43,849 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-04 21:30:45,814 ERROR: Exception on /admin-view [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 199, in admin_view
+    return render_template('admin_view.html', users=user_data, markers=marker_data)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "/Users/stephentrento/flask_app/app/templates/base.html", line 76, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/admin_view.html", line 61, in block 'content'
+    <!-- <form action="{{ url_for('edit_event', event_id=marker.id) }}" method="POST"> -->
+    
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'edit_event' with values ['event_id']. Did you mean 'edit_profile' instead?
+2025-02-04 21:31:44,747 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

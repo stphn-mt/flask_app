@@ -1,26 +1,24 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
-    TextAreaField, HiddenField, SelectField
-from wtforms.fields import DateTimeLocalField
+    TextAreaField, HiddenField, SelectField, SelectMultipleField
+from wtforms.fields import TimeField, DateField, URLField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, \
     Length
 import sqlalchemy as sa
 from app import db
 from app.models import User
 
-class RequestOrganiserForm(FlaskForm):
-    reason = StringField('What events would you organise?', validators=[DataRequired()])
-    submit = SubmitField('Submit')
+# class RequestOrganiserForm(FlaskForm):
+#     reason = StringField('What events would you organise?', validators=[DataRequired()])
+#     submit = SubmitField('Submit')
 
 class EventForm(FlaskForm):
     event_name = StringField('Event Name', validators=[DataRequired()])
-    event_time = DateTimeLocalField(
-        'Event Time',
-        validators=[DataRequired()],
-        format='%Y-%m-%dT%H:%M',  # Format for HTML5 datetime-local input
-    )
-    filter_type = SelectField('Filters', choices=[('sport', 'sport'), ('club', 'club'), ('support', 'support')])
+    filter_type = SelectField('Filters', choices=[('Sport', 'Sport'), ('Club', 'Club'), 
+    ('Support', 'Support'), ('Children','Children'), ('Other', 'Other'),
+    ])
     description = TextAreaField('Description', validators=[DataRequired()])
+    website = URLField('Website')
     address = StringField('Address')
     postcode = StringField('Postcode')
     latitude = HiddenField('Latitude', render_kw={"id": "latitude"})

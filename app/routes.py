@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import requests
 from urllib.parse import urlsplit
 from flask import render_template, flash, redirect, url_for, request, g, jsonify, abort
 from flask_login import login_user, logout_user, current_user, login_required
@@ -6,10 +7,24 @@ import sqlalchemy as sa
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, \
-        EventForm, RequestOrganiserForm
+        EventForm
 from app.models import User, Post, Marker, Location, Request_organiser
 from app.email import send_password_reset_email
 import flask_msearch
+# with app.app_context(): #clears my database of all data!
+#     def clear_data(session):
+#         meta = db.metadata
+#         for table in reversed(meta.sorted_tables):
+#             print ('Clear table %s' % table)
+#             session.execute(table.delete())
+#             session.commit()
+#     clear_data(db.session)
+
+# with app.app_context(): # hardcode an admin into my db   
+#     user = User(username='Stephen1', email='stevejameson238@gmail.com', access_level=1)
+#     user.set_password('Admin1!')
+#     db.session.add(user)
+#     db.session.commit()
 
 @app.before_request
 def before_request(): # if user is logged in, record the time they log in
@@ -18,78 +33,139 @@ def before_request(): # if user is logged in, record the time they log in
         db.session.commit()
 
 ##################################################
+def get_coordinates(postcode):
+    """Fetch latitude and longitude from Postcodes.io."""
+    url = f"https://api.postcodes.io/postcodes/{postcode}"
+    response = requests.get(url)
+    print('getting coordinates')
+    if response.status_code == 200:
+        data = response.json()
+        return data["result"]["latitude"], data["result"]["longitude"]
+    return None, None  # Return None if invalid postcode
 
-@app.route('/request_organiser', methods=["GET", "POST"])
-@login_required
-def request_organiser():
-    form = RequestOrganiserForm() #get form
 
+@app.route('/map', methods = ["GET", "POST"])
+def map():
+    form = EventForm()
     if form.validate_on_submit():
-        user = db.session.scalar(sa.select(User).where(User.username == current_user.username))
+        address = form.address.data
+        postcode = form.postcode.data
+        latitude, longitude = get_coordinates(postcode) # get coordinates from postcode automatically
+        # Check if location already exists
+        location = Location.query.filter_by(latitude=latitude, longitude=longitude).first()
+        print('checking lat and long')
+        if latitude and longitude: # if postcode is valid
+            print('postcode valid')
+            if not location: # if location doesn't exist, create it
+                location = Location(
+                    address=address,  # ADDRESS AND POSTCODE NEED TO BE FOUND
+                    postcode=postcode,
+                    latitude=latitude,
+                    longitude=longitude
+                )
+                db.session.add(location)
+                db.session.flush()  # ensure location id is assigned before using it
 
-        # Check if user already made a request
-        existing_request = db.session.scalar(sa.select(Request_organiser).where(Request_organiser.User_id == user.id))
-        if existing_request:
-            flash("You have already submitted a request.")
-            return redirect(url_for('index'))
+            # Create and store new marker
+            marker = Marker(
+                event_name = form.event_name.data,
+                approved = False, #if organiser, allow "approve" button to be clicked when showing modify event api
+                event_description = form.description.data,
+                website = form.website.data,
+                filter_type = form.filter_type.data,
+                User_id=current_user.id, # Assign marker to logged-in user
+                Location_id=location.id, # Assign marker to location
+            )
+        
+            db.session.add(marker)
+            db.session.commit()
+            print('adding marker')
+            return render_template('map.html', form=form)
+        return ("Invalid postcode", 400)
+    return render_template('map.html', form=form)
 
-        user_requested = Request_organiser(User_id=user.id, reason=form.reason.data)
-        db.session.add(user_requested)
+# transfer db marker data to /map and display all prev stored markers
+
+@app.route('/api/markers')
+def api_markers():
+    try:
+        query = request.args.get('query', '')  # Get query, default to empty string
+        if query:
+            markers = Marker.query.msearch(query, fields=['event_name', 'event_description']).all()
+        else:
+            markers = Marker.query.all()
+        
+        marker_data = [
+            {
+                'id': marker.id,
+                'latitude': marker.Location.latitude,
+                'longitude': marker.Location.longitude,
+                'event_name': marker.event_name,
+                'description': marker.event_description,
+                'approved': marker.approved,
+                'website': marker.website,
+                'address': marker.Location.address,
+                'postcode': marker.Location.postcode,
+            }
+            for marker in markers
+        ]
+        print('sending json marker data')
+        return jsonify(marker_data)
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Log error to terminal
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/markers/<int:marker_id>', methods=['PUT'])
+def update_marker(marker_id):
+    try:
+        marker = Marker.query.get(marker_id)
+        if not marker:
+            return jsonify({'error': 'Marker not found'}), 404
+        data = request.json
+        marker.event_name = data.get('event_name', marker.event_name)
+        marker.event_description = data.get('description', marker.event_description)
+        marker.approved = data.get('approved', marker.approved)
+        marker.website = data.get('website', marker.website)
+
         db.session.commit()
+        return jsonify({'message': 'Marker updated successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-        flash("Your request has been received! Please wait for an admin to respond.")
-        return redirect(url_for('index'))
+@app.route('/api/markers/<int:marker_id>', methods=['DELETE'])
+def delete_marker(marker_id):
+    try:
+        marker = Marker.query.get(marker_id)
+        if not marker:
+            return jsonify({'error': 'Marker not found'}), 404
 
-    return render_template('request_organiser.html', form=form)
-
-@app.route('/event/<int:event_id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_event(event_id):
-    event = Marker.query.get_or_404(event_id)
-    if event.created_by != current_user.id and not current_user.access_level==2:
-        abort(403)  # Unauthorized access
-    if request.method == 'POST':
-        event.event_name = request.form['title']
-        event.event_description = request.form['description']
+        db.session.delete(marker)
         db.session.commit()
-        flash('Event updated successfully!', 'success')
-        return redirect(url_for('index'))
-    return render_template('edit_event.html', event=event)
+        return jsonify({'message': 'Marker deleted successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/event/<int:event_id>/delete', methods=['POST'])
-@login_required
-def delete_event(event_id):
+############################## auto add markers from postcode above ^^
     event = Marker.query.get_or_404(event_id)
-    if event.created_by != current_user.user_id and not current_user.access_level==2:
-        abort(403)  # Unauthorized access
     db.session.delete(event)
     db.session.commit()
     flash('Event deleted successfully!', 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('admin_view'))
 
-@app.route('/user/<int:user_id>/edit', methods=['GET', 'POST'])
-@login_required
-def edit_user(user_id):
-    if not current_user.access_level==2:
-        abort(403)  # Unauthorized access
-    user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        user.username = request.form['username']
-        db.session.commit()
-        flash('User updated successfully!', 'success')
-        return redirect(url_for('admin_view'))
-    return render_template('edit_user.html', user=user)
+@app.route('/update_user', methods=['POST'])
+def update_user():
+    data = request.json
+    user = User.query.get(data['id'])
+    setattr(user, data['field'], data['value'])  # Update dynamically
+    db.session.commit()
+    return jsonify({'status': 'success'})
 
-@app.route('/user/<int:user_id>/delete', methods=['POST'])
-@login_required
+@app.route('/delete_user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
-    if not current_user.access_level==2:
-        abort(403)  # Unauthorized access
-    user = User.query.get_or_404(user_id)
+    user = User.query.get(user_id)
     db.session.delete(user)
     db.session.commit()
-    flash('User deleted successfully!', 'success')
-    return redirect(url_for('admin_view'))
+    return jsonify({'status': 'deleted'})
 ##################################################
 @app.route('/', methods=['GET', 'POST']) #accept data input from webpage
 @app.route('/index', methods=['GET', 'POST']) # accept “/” or “/index” as route
@@ -113,80 +189,16 @@ def index():
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
 
-@app.route('/map', methods = ["GET", "POST"])
-def map():
-    form = EventForm()
-    if form.validate_on_submit():
-        # Retrieve form data
-        event_name = form.event_name.data
-        event_time = form.event_time.data
-        event_description = form.description.data
-        latitude = form.latitude.data
-        longitude = form.longitude.data
-        filter_type = form.filter_type.data  
-        address = form.address.data
-        postcode = form.address.data
-        # Check if location already exists
-        location = Location.query.filter_by(latitude=latitude, longitude=longitude).first()
-        
-        if not location:
-            location = Location(
-                address=address,  # ADDRESS AND POSTCODE NEED TO BE FOUND
-                postcode=postcode,
-                latitude=latitude,
-                longitude=longitude
-            )
-            db.session.add(location)
-            db.session.flush()  # ensure location id is assigned before using it
-
-        # Create and store new marker
-        marker = Marker(
-            event_name=event_name,
-            event_time=event_time,
-            event_description=event_description,
-            filter_type=filter_type,
-            User_id=current_user.id,  # Assign marker to logged-in user
-            Location_id=location.id   # Assign marker to location
-        )
-        
-        db.session.add(marker)
-        db.session.commit()
-        return render_template('map.html', form=form)
-    return render_template('map.html', form=form)
-
-# transfer db marker data to /map and display all prev stored markers
-
-@app.route('/api/markers')
-def api_markers():
-    try:
-        query = request.args.get('query', '')  # Get query, default to empty string
-        if query:
-            markers = Marker.query.msearch(query, fields=['event_name', 'event_description']).all()
-        else:
-            markers = Marker.query.all()
-
-        marker_data = [
-            {
-                'latitude': marker.Location.latitude,
-                'longitude': marker.Location.longitude,
-                'event_name': marker.event_name,
-                'event_time': marker.event_time,
-                'description': marker.event_description
-            }
-            for marker in markers
-        ]
-        return jsonify(marker_data)
-    except Exception as e:
-        print(f"Error: {str(e)}")  # Log error to terminal
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/admin-view')
 def admin_view():
-    user_data = User.query.all()  # Fetch all users
-    marker_data = Marker.query.all()  # Fetch all markers
-
-    # Pass data to the template
-    return render_template('admin_view.html', users=user_data, markers=marker_data)
+    if current_user.is_authenticated and current_user.access_level==1: #so that users can't try to get in from url
+        user_data = User.query.all()  # Fetch all users
+        marker_data = Marker.query.all()  # Fetch all markers
+        print(user_data, marker_data)
+        # Pass data to the template
+        return render_template('admin_view.html', users=user_data, markers=marker_data)
+    else:
+        redirect(url_for('index.html'))
 
 @app.route('/explore', methods=["GET", "POST"])
 @login_required

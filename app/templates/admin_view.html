@@ -5,45 +5,61 @@ Admin_view
 
 {% block content %}
     <body>
-        <div class="container mt-5">
-            <h1 class="mb-4">Admin View</h1>
-            <p> Here you can view all users and events. Use the 'select' button and then click on users/events to delete or modify.</p>
-            <!-- User Table -->
-            <div>
-                <h2>User Management</h2>
-                <ul>
-                    {% for user in users %}
-                    <li>
-                        <strong>{{ user.username }}</strong> {% if user.access_level==2 %}(Admin){% endif %}
-                        <button onclick="toggleOptions( {{ user.id }} )">Select</button>
-                        <div id="options-{{ user.id }}" style="display:none;">
-                            <a href="{{ url_for('edit_user', user_id=user.id) }}">Modify</a>
-                            <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                                <button type="submit">Delete</button>
-                            </form>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
+        <title>User Management</title>
+        <script>
+            function editUser(event, userId, field) {
+                let newValue = event.target.innerText;
+                fetch('/update_user', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id: userId, field: field, value: newValue})
+                }).then(response => response.json())
+                .then(data => console.log(data));
+            }
+
+            function deleteUser(userId, row) {
+                fetch(`/delete_user/${userId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'deleted') {
+                            row.remove();
+                        }
+                    });
+            }
+        </script>
+    </head>
+    <body>
+        <h2>User Management</h2>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Delete</th>
+                <th>Modify</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'name')">{{ user.username }}</td>
+                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'email')">{{ user.email }}</td>
+                <td><button onclick="deleteUser({{ user.id }}, this.parentNode.parentNode)">Delete</button></td>
+                <td><button onclick="modifyUser({{ user.id }}, this.parentNode.parentNode)">Modify</button></td>
+            </tr>
+            {% endfor %}
+    </table>
             <!-- note - can use current_user or load_user to get id more cleanly??-->
             <!-- Marker Table -->
             <div>
                 <h2>Event Management</h2>
-                <ul>
+                <table>
                     {% for marker in markers %}
-                    <li>
-                        <strong>{{ marker.event_name }}</strong>
-                        <button onclick='toggleOptions({{ marker.id }})'>Select</button>
-                        <div id='options-{{ marker.id }}' style='display:none;'>
-                            <a href="{{ url_for('edit_event', event_id=marker.id) }}">Modify</a>
-                            <form action="{{ url_for('delete_event', event_id=marker.id) }}" method="POST" style='display:inline;'>
-                                <button type="submit">Delete</button>
-                            </form>
-                        </div>
-                    </li>
+                    <tr>
+                        <strong>{{ marker.event_name }}</strong> <br>
+                        
+                    </tr>
                     {% endfor %}
-                </ul>
+                </table>
             </div>
             
             <script>

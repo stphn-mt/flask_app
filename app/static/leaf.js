@@ -15,39 +15,78 @@ function fetchMarkers(query = "") {
         url += `?query=${encodeURIComponent(query)}`;
     }
 
+    console.log("Fetching markers from:", url);  // Debugging
+
     fetch(url)
-    .then(response => response.json())
-    .then(data => {
-        map.eachLayer(layer => {
-            if (layer instanceof L.Marker) {
-                map.removeLayer(layer);  // Clear existing markers
-            }
-        });
+        .then(response => response.json())
+        .then(data => {
+            console.log("Marker data received:", data); // Debugging
 
-        data.forEach(marker => {
-            var markerInstance = L.marker([marker.latitude, marker.longitude]).addTo(map);
-            markerInstance.bindPopup(`
-                <b>${marker.event_name}</b><br>
-                Time: ${marker.event_time}<br>
-                ${marker.description}
-            `);
-        });
-    })
-    .catch(error => console.error('Error fetching markers:', error));
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            data.forEach(marker => {
+                var markerInstance = L.marker([marker.latitude, marker.longitude]).addTo(map);
+                markerInstance.bindPopup(`
+                    <b>${marker.event_name}</b><br>
+                    ${marker.description}<br>
+                    ${marker.approved}<br>
+                    ${marker.website}<br>
+                    ${marker.address}<br>
+                    ${marker.postcode}<br>
+                    <button onclick="editMarker(${marker.id})">Edit</button>
+                    <button onclick="deleteMarker(${marker.id})">Delete</button>
+                `);
+            });
+        })
+        .catch(error => console.error('Error fetching markers:', error));
 }
-
-// Call fetchMarkers() on page load to display all markers
 fetchMarkers();
 
-// Handle form submission
+function editMarker(markerId) {
+    let newName = prompt("Enter new event name:");
+    let newDescription = prompt("Enter new event description:");
+
+    fetch(`/api/markers/${markerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            event_name: newName,
+            description: newDescription,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        fetchMarkers();  // Refresh markers
+    })
+    .catch(error => console.error("Error updating marker:", error));
+}
+
+function deleteMarker(markerId) {
+    if (confirm("Are you sure you want to delete this marker?")) {
+        fetch(`/api/markers/${markerId}`, {
+            method: "DELETE"
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchMarkers();  // Refresh markers
+        })
+        .catch(error => console.error("Error deleting marker:", error));
+    }
+}
+
+// //////////////////////////////
+// Handle search requests
 document.querySelector('form').addEventListener('submit', function (e) {
     e.preventDefault();
     const query = document.getElementById('query').value;
     fetchMarkers(query);
 }); // GET http request asynchronously from view function '/api/markers'. returns Promise
-
-// //////////////////////////////
-
 
 // Variable to store the current marker
 var currentMarker = null;

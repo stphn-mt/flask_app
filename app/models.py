@@ -100,7 +100,7 @@ class User(UserMixin, db.Model):
         # lazy="dynamic",           # Enables efficient querying of Markers
     )
     def __repr__(self):
-        return '<User {}>'.format(self.Username) # provides information in a nice format for each User
+        return '<User {}>'.format(self.username) # provides information in a nice format for each User
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password) # applies a hashing algorithm to encrypt passwords
@@ -186,10 +186,12 @@ class Post(db.Model):
 class Marker(db.Model):
     __tablename__ = "Marker"
     __searchable__ = ['event_name', 'event_description', 'User_id', 'filter_type']  # Fields to index
-    
+    ########################################
+    approved: so.Mapped[bool] = so.mapped_column(default = False, nullable = False)
+    website: so.Mapped[str] = so.mapped_column(nullable=True)
+    ########################################
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    event_name: so.Mapped[str] = so.mapped_column(sa.String(140), nullable=True)
-    event_time: so.Mapped[datetime] = so.mapped_column(nullable=True)
+    event_name: so.Mapped[str] = so.mapped_column(sa.String(140), nullable=False)
     event_description: so.Mapped[str] = so.mapped_column(sa.String(140))
     filter_type: so.Mapped[str] = so.mapped_column(sa.String(60))
     User_id: so.Mapped[str] = so.mapped_column(db.ForeignKey("User.id"))
