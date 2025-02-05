@@ -33,6 +33,8 @@ function getMarkerIcon(filterType, approved) {
     });
 }
 
+const markerClusterGroup = L.markerClusterGroup();
+
 function fetchMarkers(query = "") {
     let url = "/api/markers";
     if (query) {
@@ -44,12 +46,14 @@ function fetchMarkers(query = "") {
     fetch(url)
         .then(response => response.json())
         .then(data => {
+            markerClusterGroup.clearLayers();  // Clear previous markers
+
             data.forEach(marker => {
                 let markerInstance = L.marker(
                     [marker.latitude, marker.longitude],
                     { icon: getMarkerIcon(marker.filter_type, marker.approved) }
-                ).addTo(map);
-                
+                );
+
                 markerInstance.bindPopup(`
                     <b>${marker.event_name}</b><br>
                     ${marker.description}<br>
@@ -61,7 +65,11 @@ function fetchMarkers(query = "") {
                     <button onclick="deleteMarker(${marker.id})">Delete</button>
                     <button onclick="approveMarker(${marker.id})">Approve</button>
                 `);
+
+                markerClusterGroup.addLayer(markerInstance);
             });
+
+            map.addLayer(markerClusterGroup);  // Add clustered markers to the map
         })
         .catch(error => console.error('Error fetching markers:', error));
 }

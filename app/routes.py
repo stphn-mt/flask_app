@@ -8,7 +8,7 @@ from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, \
         EventForm
-from app.models import User, Post, Marker, Location, Request_organiser
+from app.models import User, Post, Marker, Location
 from app.email import send_password_reset_email
 import flask_msearch
 # with app.app_context(): #clears my database of all data!
@@ -25,6 +25,8 @@ import flask_msearch
 #     user.set_password('Admin1!')
 #     db.session.add(user)
 #     db.session.commit()
+
+
 
 @app.before_request
 def before_request(): # if user is logged in, record the time they log in
@@ -90,7 +92,9 @@ def map():
 def api_markers():
     try:
         query = request.args.get('query', '')  # Get query, default to empty string
+        print(query)
         if query:
+            print('searching')
             markers = Marker.query.msearch(query, fields=['event_name', 'event_description']).all()
         else:
             markers = Marker.query.all()
@@ -106,6 +110,7 @@ def api_markers():
                 'website': marker.website,
                 'address': marker.Location.address,
                 'postcode': marker.Location.postcode,
+                'filter_type': marker.filter_type,
             }
             for marker in markers
         ]
@@ -126,6 +131,7 @@ def update_marker(marker_id):
         marker.event_name = data.get('event_name', marker.event_name)
         marker.event_description = data.get('description', marker.event_description)
         marker.website = data.get('website', marker.website)
+        Marker.reindex()
         db.session.commit()
         return jsonify({'message': 'Marker updated successfully'})
     except Exception as e:
@@ -137,8 +143,8 @@ def delete_marker(marker_id):
         marker = Marker.query.get(marker_id)
         if not marker:
             return jsonify({'error': 'Marker not found'}), 404
-
         db.session.delete(marker)
+        Marker.reindex()
         db.session.commit()
         return jsonify({'message': 'Marker deleted successfully'})
     except Exception as e:
@@ -155,18 +161,14 @@ def approve(marker_id):
         return jsonify({'message': 'Marker approved successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-############################## auto add markers from postcode above ^^
-    event = Marker.query.get_or_404(event_id)
-    db.session.delete(event)
-    db.session.commit()
-    flash('Event deleted successfully!', 'success')
-    return redirect(url_for('admin_view'))
+
 
 @app.route('/update_user', methods=['POST'])
 def update_user():
     data = request.json
     user = User.query.get(data['id'])
     setattr(user, data['field'], data['value'])  # Update dynamically
+    User.reindex()
     db.session.commit()
     return jsonify({'status': 'success'})
 
@@ -174,8 +176,10 @@ def update_user():
 def delete_user(user_id):
     user = User.query.get(user_id)
     db.session.delete(user)
+    User.reindex()
     db.session.commit()
     return jsonify({'status': 'deleted'})
+
 ##################################################
 @app.route('/', methods=['GET', 'POST']) #accept data input from webpage
 @app.route('/index', methods=['GET', 'POST']) # accept “/” or “/index” as route
@@ -202,13 +206,23 @@ def index():
 @app.route('/admin-view')
 def admin_view():
     if current_user.is_authenticated and current_user.access_level==1: #so that users can't try to get in from url
-        user_data = User.query.all()  # Fetch all users
-        marker_data = Marker.query.all()  # Fetch all markers
-        print(user_data, marker_data)
-        # Pass data to the template
-        return render_template('admin_view.html', users=user_data, markers=marker_data)
+        try:
+            query = request.args.get('query', '')  # Get query, default to empty string
+            print(query)
+            if query:
+                print('searching')
+                user_data = User.query.msearch(query, fields=['username', 'email']).all()
+            else:
+                user_data = User.query.all()
+            marker_data = Marker.query.all()  # Fetch all markers
+            print(user_data, marker_data)
+            # Pass data to the template
+            return render_template('admin_view.html', users=user_data, markers=marker_data)
+        except Exception as e:
+            print(f"Error: {str(e)}")  # Log error to terminal
+            return jsonify({'error': str(e)}), 500
     else:
-        redirect(url_for('index.html'))
+        return redirect(url_for('index.html'))
 
 @app.route('/explore', methods=["GET", "POST"])
 @login_required

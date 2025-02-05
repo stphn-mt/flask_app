@@ -4,6 +4,14 @@ Admin_view
 {% endblock %}
 
 {% block content %}
+    <h4>Search</h4>
+    <form class="form-inline" method="GET" action="{{ url_for('admin_view') }}">
+        <div class="form-group">
+            <label for="query">Name</label>
+            <input type="text" class="form-control" name="query" id="query">
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
     <body>
         <title>User Management</title>
         <script>
@@ -35,16 +43,16 @@ Admin_view
                 <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Level</th>
                 <th>Delete</th>
-                <th>Modify</th>
             </tr>
             {% for user in users %}
             <tr>
                 <td>{{ user.id }}</td>
                 <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'name')">{{ user.username }}</td>
                 <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'email')">{{ user.email }}</td>
+                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'email')">{% if user.access_level ==1 %}Admin{% else %}User{% endif %}</td>
                 <td><button onclick="deleteUser({{ user.id }}, this.parentNode.parentNode)">Delete</button></td>
-                <td><button onclick="modifyUser({{ user.id }}, this.parentNode.parentNode)">Modify</button></td>
             </tr>
             {% endfor %}
     </table>

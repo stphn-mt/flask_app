@@ -21,11 +21,15 @@
         crossorigin="anonymous">
     <!-- add fontAwesome for marker icons  -->
     <script src="https://kit.fontawesome.com/b2ebd84f3c.js" crossorigin="anonymous"></script>
+    <!-- add clustering? -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container">
-        <a class="navbar-brand" href="{{ url_for('index') }}">Microblog</a>
+        <a class="navbar-brand" href="{{ url_for('index') }}">Our Camden</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>

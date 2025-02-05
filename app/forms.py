@@ -8,9 +8,7 @@ import sqlalchemy as sa
 from app import db
 from app.models import User
 
-# class RequestOrganiserForm(FlaskForm):
-#     reason = StringField('What events would you organise?', validators=[DataRequired()])
-#     submit = SubmitField('Submit')
+
 
 class EventForm(FlaskForm):
     event_name = StringField('Event Name', validators=[DataRequired()])

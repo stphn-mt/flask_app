@@ -10,20 +10,6 @@ import jwt
 from app import app, db, login, search
 # from flask_msearch import Search
 ########################################
-class Request_organiser(db.Model):
-    __tablename__ = "Request_organiser"
-    User_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey("User.id"),
-        primary_key=True, 
-        unique=True
-    )
-    reason: so.Mapped[str] = so.mapped_column(sa.String(256))
-    # Relationship to User
-    User: so.Mapped['User'] = so.relationship(
-        "User",
-        back_populates="request_organiser",
-        # lazy="select"
-    ) #maps foreign key to User table's id
 
 class Location(db.Model):
     __tablename__ = "Location"
@@ -39,27 +25,20 @@ class Location(db.Model):
         # lazy="dynamic",  # Enables efficient querying of Markers
     )
 
-# Organisation = sa.Table(
-#     'organisation',
-#     db.metadata,
-#     sa.Column('id', sa.Integer, primary_key=True),
-#     sa.Column('name', sa.String)
-# ) doesn't work, might have to add extra table just for this
-#  and its not that necessary of a feature anyway
-########################################
 
 followers = sa.Table(
     'followers',
     db.metadata,
-    sa.Column('follower_id', sa.Integer, sa.ForeignKey('User.id'),
+    sa.Column('follower_id', sa.Integer, sa.ForeignKey('User.id', ondelete='CASCADE'),
               primary_key=True),
-    sa.Column('followed_id', sa.Integer, sa.ForeignKey('User.id'),
+    sa.Column('followed_id', sa.Integer, sa.ForeignKey('User.id', ondelete='CASCADE'),
               primary_key=True)
 ) #linking table for following and followed
 
 
 class User(UserMixin, db.Model):
     __tablename__ = "User"
+    __searchable__ = ['username', 'email']
     id: so.Mapped[int] = so.mapped_column(primary_key=True) # so.Mapped gives a python data type to the attr, so.mapped_column creates the actual column
 
     access_level: so.Mapped[int] = so.mapped_column(
@@ -79,21 +58,19 @@ class User(UserMixin, db.Model):
         default=lambda: datetime.now(timezone.utc))
 
     posts: so.WriteOnlyMapped['Post'] = so.relationship( 
-        back_populates='author') #back_populates links Posts.author to User.posts
+        back_populates='author',
+        passive_deletes=True) #back_populates links Posts.author to User.posts
     following: so.WriteOnlyMapped['User'] = so.relationship(
         secondary=followers, primaryjoin=(followers.c.follower_id == id), # establish link between User and Follower tables, where the id matches (all the Users this current User follows)
         secondaryjoin=(followers.c.followed_id == id), #links followers back to Users. identifies all Users who are followed by the current User
-        back_populates='followers') #links User.following to Follower.followers (who the User is following)
+        back_populates='followers',
+        passive_deletes=True) #links User.following to Follower.followers (who the User is following)
     followers: so.WriteOnlyMapped['User'] = so.relationship(
         secondary=followers, primaryjoin=(followers.c.followed_id == id),
         secondaryjoin=(followers.c.follower_id == id),
-        back_populates='following') #same but for who the User is being followed by
+        back_populates='following',
+        passive_deletes=True) #same but for who the User is being followed by
 
-    request_organiser: so.Mapped["Request_organiser"] = so.relationship(
-        "Request_organiser",
-        back_populates="User",
-        # uselist=False,  # This ensures a one-to-one relationship
-    )
     Markers: so.Mapped["Marker"] = so.relationship(
         "Marker",
         back_populates="creator",  # Links to the `Marker.creator` relationship
@@ -162,7 +139,9 @@ class User(UserMixin, db.Model):
         except Exception:
             return
         return db.session.get(User, id)
-
+    @staticmethod
+    def reindex():
+        search.create_index(update=True)
 
 @login.user_loader
 def load_User(id):
@@ -175,7 +154,7 @@ class Post(db.Model):
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
     timestamp: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc))
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id),
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id, ondelete='CASCADE'),
                                                index=True)
 
     author: so.Mapped[User] = so.relationship(back_populates='posts')
@@ -212,6 +191,10 @@ class Marker(db.Model):
         back_populates="Markers",  # Links to the `User.Markers` relationship
         foreign_keys="[Marker.User_id]"
     )
+@staticmethod
+def reindex():
+    search.create_index(update=True)
+
 
 # Set up models
 with app.app_context():
