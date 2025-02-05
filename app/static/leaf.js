@@ -13,11 +13,11 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 function getMarkerIcon(filterType, approved) {
     let iconClass = "fa-solid "; // Base FontAwesome class
 
-    if (filterType === "sports") {
+    if (filterType === "Sport") {
         iconClass += "fa-person-running";
-    } else if (filterType === "charity") {
+    } else if (filterType === "Support") {
         iconClass += "fa-plus";
-    } else if (filterType === "club") {
+    } else if (filterType === "Club") {
         iconClass += "fa-home";
     } else {
         iconClass += "fa-map-marker-alt"; // Default marker
