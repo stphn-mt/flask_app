@@ -9,6 +9,30 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // //////////////////////////////
 // This should work now with the data passed from Flask
 // Fetch marker data from the Flask API
+// Define marker icons based on filter_type
+function getMarkerIcon(filterType, approved) {
+    let iconClass = "fa-solid "; // Base FontAwesome class
+
+    if (filterType === "sports") {
+        iconClass += "fa-person-running";
+    } else if (filterType === "charity") {
+        iconClass += "fa-plus";
+    } else if (filterType === "club") {
+        iconClass += "fa-home";
+    } else {
+        iconClass += "fa-map-marker-alt"; // Default marker
+    }
+
+    let color = approved ? "blue" : "red"; // Blue for approved, red for non-approved
+
+    return L.divIcon({
+        className: "", // No special Leaflet styling needed
+        html: `<i class="${iconClass}" style="color: ${color}; font-size: 24px;"></i>`,
+        iconSize: [30, 30], // Adjust as needed
+        iconAnchor: [15, 30], // Adjust as needed
+    });
+}
+
 function fetchMarkers(query = "") {
     let url = "/api/markers";
     if (query) {
@@ -20,25 +44,22 @@ function fetchMarkers(query = "") {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            console.log("Marker data received:", data); // Debugging
-
-            map.eachLayer(layer => {
-                if (layer instanceof L.Marker) {
-                    map.removeLayer(layer);
-                }
-            });
-
             data.forEach(marker => {
-                var markerInstance = L.marker([marker.latitude, marker.longitude]).addTo(map);
+                let markerInstance = L.marker(
+                    [marker.latitude, marker.longitude],
+                    { icon: getMarkerIcon(marker.filter_type, marker.approved) }
+                ).addTo(map);
+                
                 markerInstance.bindPopup(`
                     <b>${marker.event_name}</b><br>
                     ${marker.description}<br>
-                    ${marker.approved}<br>
+                    Approved: ${marker.approved ? '✅' : '❌'}<br>
                     ${marker.website}<br>
                     ${marker.address}<br>
                     ${marker.postcode}<br>
                     <button onclick="editMarker(${marker.id})">Edit</button>
                     <button onclick="deleteMarker(${marker.id})">Delete</button>
+                    <button onclick="approveMarker(${marker.id})">Approve</button>
                 `);
             });
         })
@@ -49,6 +70,7 @@ fetchMarkers();
 function editMarker(markerId) {
     let newName = prompt("Enter new event name:");
     let newDescription = prompt("Enter new event description:");
+    let newWebsite = prompt("Enter new website link:");
 
     fetch(`/api/markers/${markerId}`, {
         method: "PUT",
@@ -56,6 +78,7 @@ function editMarker(markerId) {
         body: JSON.stringify({
             event_name: newName,
             description: newDescription,
+            website: newWebsite,
         })
     })
     .then(response => response.json())
@@ -79,7 +102,19 @@ function deleteMarker(markerId) {
         .catch(error => console.error("Error deleting marker:", error));
     }
 }
-
+function approveMarker(markerId) {
+    if (confirm("Are you sure you want to approve this marker?")) {
+        fetch(`/approve/${markerId}`, {
+            method: "PUT"
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            fetchMarkers();  // Refresh markers
+        })
+        .catch(error => console.error("Error approving marker:", error));
+    }
+}
 // //////////////////////////////
 // Handle search requests
 document.querySelector('form').addEventListener('submit', function (e) {

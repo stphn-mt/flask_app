@@ -82,7 +82,7 @@ def map():
             print('adding marker')
             return render_template('map.html', form=form)
         return ("Invalid postcode", 400)
-    return render_template('map.html', form=form)
+    return render_template('map.html', form=form, user_access_level=current_user.access_level)
 
 # transfer db marker data to /map and display all prev stored markers
 
@@ -122,11 +122,10 @@ def update_marker(marker_id):
         if not marker:
             return jsonify({'error': 'Marker not found'}), 404
         data = request.json
+
         marker.event_name = data.get('event_name', marker.event_name)
         marker.event_description = data.get('description', marker.event_description)
-        marker.approved = data.get('approved', marker.approved)
         marker.website = data.get('website', marker.website)
-
         db.session.commit()
         return jsonify({'message': 'Marker updated successfully'})
     except Exception as e:
@@ -145,6 +144,17 @@ def delete_marker(marker_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/approve/<int:marker_id>', methods=['PUT'])
+def approve(marker_id):
+    try:
+        marker = Marker.query.get(marker_id)
+        if not marker:
+            return jsonify({'error': 'Marker not found'}), 404
+        marker.approved = True
+        db.session.commit()
+        return jsonify({'message': 'Marker approved successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 ############################## auto add markers from postcode above ^^
     event = Marker.query.get_or_404(event_id)
     db.session.delete(event)
