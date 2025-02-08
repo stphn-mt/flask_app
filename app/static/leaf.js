@@ -1,4 +1,12 @@
-var map = L.map('map').setView([51.530755, -0.131733], 13);
+var map = L.map('map').setView([51.530755, -0.131733], 17);
+
+var bounds = [
+    [51.52017, -0.14918], // Southwest corner
+    [51.54126, -0.12262]    // Northeast corner
+];
+
+// Set maxBounds to restrict dragging outside the area
+map.setMaxBounds(bounds);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,

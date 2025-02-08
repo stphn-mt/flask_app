@@ -4,7 +4,7 @@ from urllib.parse import urlsplit
 from flask import render_template, flash, redirect, url_for, request, g, jsonify, abort, session
 from flask_login import login_user, logout_user, current_user, login_required
 import sqlalchemy as sa
-from app import app, db
+from app import app, db, search
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, \
         EventForm
@@ -87,8 +87,10 @@ def map():
                 db.session.add(marker)
                 db.session.commit()
                 print('adding marker')
-                return render_template('map.html', form=form)
+                session['marker_count'] += 1  # Increment counter
+                return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
             return ("Invalid postcode", 400)
+
     else:
         flash('You have reached the maximum number of markers allowed today.', 'danger')
     return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
@@ -123,8 +125,6 @@ def api_markers():
             for marker in markers
         ]
 
-        print('sending json marker data')
-        print(marker_data)
         return jsonify(marker_data)
     except Exception as e:
         print(f"Error: {str(e)}")  # Log error to terminal
@@ -140,9 +140,11 @@ def update_marker(marker_id):
 
         marker.event_name = data.get('event_name', marker.event_name)
         marker.event_description = data.get('description', marker.event_description)
-        marker.website = data.get('website', marker.website)
-        Marker.reindex()
+        if marker.website:
+            marker.website = data.get('website', marker.website)
         db.session.commit()
+        search.update_index()
+        search.update_index(Marker)
         return jsonify({'message': 'Marker updated successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -154,8 +156,11 @@ def delete_marker(marker_id):
         if not marker:
             return jsonify({'error': 'Marker not found'}), 404
         db.session.delete(marker)
-        Marker.reindex()
+        if marker.User_id == current_user.id:
+            session['max_marker'] -= 1
         db.session.commit()
+        search.update_index()
+        search.update_index(Marker)
         return jsonify({'message': 'Marker deleted successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -178,16 +183,18 @@ def update_user():
     data = request.json
     user = User.query.get(data['id'])
     setattr(user, data['field'], data['value'])  # Update dynamically
-    User.reindex()
     db.session.commit()
+    search.update_index()
+    search.update_index(User)
     return jsonify({'status': 'success'})
 
 @app.route('/delete_user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
     db.session.delete(user)
-    User.reindex()
     db.session.commit()
+    search.update_index()
+    search.update_index(User)
     return jsonify({'status': 'deleted'})
 
 ##################################################
@@ -300,8 +307,7 @@ def reset_password_request():
             sa.select(User).where(User.email == form.email.data)) # get first result from query for the user’s email
         if user:
             send_password_reset_email(user) # if there is such an email given by the user, send an automated email
-        flash(
-            'Check your email for the instructions to reset your password')
+        flash('Check your email for the instructions to reset your password')
         return redirect(url_for('login'))
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form) # refresh the page if incorrectly filled in form
@@ -366,14 +372,14 @@ def follow(username):
         user = db.session.scalar(
             sa.select(User).where(User.username == username))
         if user is None:
-            flash('User %(username)s not found.', username=username) #if no user to follow, flash message and redirect
+            flash(f'User {username} not found.') #if no user to follow, flash message and redirect
             return redirect(url_for('index'))
         if user == current_user:
             flash('You cannot follow yourself!')
             return redirect(url_for('user', username=username))
         current_user.follow(user)
         db.session.commit()
-        flash('You are following %(username)s!', username=username)
+        flash(f'You are following {username}!')
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('index'))
@@ -387,14 +393,14 @@ def unfollow(username):
         user = db.session.scalar(
             sa.select(User).where(User.username == username))
         if user is None:
-            flash('User %(username)s not found.', username=username)
+            flash(f'User {username} not found.')
             return redirect(url_for('index'))
         if user == current_user:
             flash('You cannot unfollow yourself!')
             return redirect(url_for('user', username=username))
         current_user.unfollow(user)
         db.session.commit()
-        flash('You are not following %(username)s.', username=username)
+        flash(f'You are not following {username}.')
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('index'))

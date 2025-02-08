@@ -139,9 +139,7 @@ class User(UserMixin, db.Model):
         except Exception:
             return
         return db.session.get(User, id)
-    @staticmethod
-    def reindex():
-        search.create_index(update=True)
+
 
 @login.user_loader
 def load_User(id):
@@ -191,9 +189,9 @@ class Marker(db.Model):
         back_populates="Markers",  # Links to the `User.Markers` relationship
         foreign_keys="[Marker.User_id]"
     )
-@staticmethod
-def reindex():
-    search.create_index(update=True)
+# @staticmethod
+# def reindex():
+#     search.create_index(update=True)
 
 
 # Set up models
