@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -17,3 +18,4 @@ class Config:
     MSEARCH_INDEX_NAME = 'msearch'  # Name of the index directory
     MSEARCH_BACKEND = 'whoosh'  # Can also be 'sphinx' or 'elasticsearch'
     MSEARCH_ENABLE = True
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=24)

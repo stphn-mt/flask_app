@@ -1,11 +1,4 @@
-2025-02-05 22:06:58,157 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:07:05,860 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:07:21,591 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:07:38,636 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:07:43,788 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:08:13,206 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:08:48,730 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:08:55,482 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-08 13:31:12,927 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -16,22 +9,55 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 87, in map
+  File "/Users/stephentrento/flask_app/app/routes.py", line 94, in map
     return render_template('map.html', form=form, user_access_level=current_user.access_level)
-                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'AnonymousUserMixin' object has no attribute 'access_level'
-2025-02-05 22:24:37,708 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:50:25,743 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:51:04,151 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:52:35,810 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:53:37,797 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:53:50,448 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:54:56,828 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 22:55:16,102 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 23:07:39,720 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 23:16:50,673 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 23:17:40,552 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 23:19:39,580 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 23:26:55,394 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 23:28:36,293 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-05 23:40:37,243 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/stephentrento/flask_app/app/templates/map.html", line 2, in top-level template code
+    {% import "bootstrap_wtf.html" as wtf %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/base.html", line 82, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/map.html", line 25, in block 'content'
+    const thisUser = {{ user_data|tojson }}; // Extract user data separately
+    ^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/filters.py", line 1726, in do_tojson
+    return htmlsafe_json_dumps(value, dumps=dumps, **kwargs)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/utils.py", line 669, in htmlsafe_json_dumps
+    dumps(obj, **kwargs)
+    ~~~~~^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/json/provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.0_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ~~~~~~^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.0_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/opt/homebrew/Cellar/python@3.13/3.13.0_1/Frameworks/Python.framework/Versions/3.13/lib/python3.13/json/encoder.py", line 261, in iterencode
+    return _iterencode(o, 0)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/json/provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type Undefined is not JSON serializable
+2025-02-08 13:37:54,604 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 13:39:45,163 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 13:42:08,137 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 13:43:40,878 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 13:44:28,875 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:03:38,714 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:15:32,452 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:16:52,028 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:21:42,256 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:23:32,808 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:24:12,160 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:27:26,473 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:29:01,171 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-08 14:29:32,029 INFO: Microblog startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

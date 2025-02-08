@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import requests
 from urllib.parse import urlsplit
-from flask import render_template, flash, redirect, url_for, request, g, jsonify, abort
+from flask import render_template, flash, redirect, url_for, request, g, jsonify, abort, session
 from flask_login import login_user, logout_user, current_user, login_required
 import sqlalchemy as sa
 from app import app, db
@@ -33,6 +33,7 @@ def before_request(): # if user is logged in, record the time they log in
     if current_user.is_authenticated:
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
+        
 
 ##################################################
 def get_coordinates(postcode):
@@ -49,42 +50,48 @@ def get_coordinates(postcode):
 @app.route('/map', methods = ["GET", "POST"])
 def map():
     form = EventForm()
-    if form.validate_on_submit():
-        address = form.address.data
-        postcode = form.postcode.data
-        latitude, longitude = get_coordinates(postcode) # get coordinates from postcode automatically
-        # Check if location already exists
-        location = Location.query.filter_by(latitude=latitude, longitude=longitude).first()
-        print('checking lat and long')
-        if latitude and longitude: # if postcode is valid
-            print('postcode valid')
-            if not location: # if location doesn't exist, create it
-                location = Location(
-                    address=address,  # ADDRESS AND POSTCODE NEED TO BE FOUND
-                    postcode=postcode,
-                    latitude=latitude,
-                    longitude=longitude
-                )
-                db.session.add(location)
-                db.session.flush()  # ensure location id is assigned before using it
+    session.permanent = True
+    if 'marker_count' not in session:
+        session['marker_count'] = 0  # Initialize counter if not set
+    if session['marker_count'] <= 1:
+        if form.validate_on_submit():
+            address = form.address.data
+            postcode = form.postcode.data
+            latitude, longitude = get_coordinates(postcode) # get coordinates from postcode automatically
+            # Check if location already exists
+            location = Location.query.filter_by(latitude=latitude, longitude=longitude).first()
+            print('checking lat and long')
+            if latitude and longitude: # if postcode is valid
+                print('postcode valid')
+                if not location: # if location doesn't exist, create it
+                    location = Location(
+                        address=address,  # ADDRESS AND POSTCODE NEED TO BE FOUND
+                        postcode=postcode,
+                        latitude=latitude,
+                        longitude=longitude
+                    )
+                    db.session.add(location)
+                    db.session.flush()  # ensure location id is assigned before using it
 
-            # Create and store new marker
-            marker = Marker(
-                event_name = form.event_name.data,
-                approved = False, #if organiser, allow "approve" button to be clicked when showing modify event api
-                event_description = form.description.data,
-                website = form.website.data,
-                filter_type = form.filter_type.data,
-                User_id=current_user.id, # Assign marker to logged-in user
-                Location_id=location.id, # Assign marker to location
-            )
-        
-            db.session.add(marker)
-            db.session.commit()
-            print('adding marker')
-            return render_template('map.html', form=form)
-        return ("Invalid postcode", 400)
-    return render_template('map.html', form=form, user_access_level=current_user.access_level)
+                # Create and store new marker
+                marker = Marker(
+                    event_name = form.event_name.data,
+                    approved = False, #if organiser, allow "approve" button to be clicked when showing modify event api
+                    event_description = form.description.data,
+                    website = form.website.data,
+                    filter_type = form.filter_type.data,
+                    User_id=current_user.id, # Assign marker to logged-in user
+                    Location_id=location.id, # Assign marker to location
+                )
+            
+                db.session.add(marker)
+                db.session.commit()
+                print('adding marker')
+                return render_template('map.html', form=form)
+            return ("Invalid postcode", 400)
+    else:
+        flash('You have reached the maximum number of markers allowed today.', 'danger')
+    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
 
 # transfer db marker data to /map and display all prev stored markers
 
@@ -111,10 +118,13 @@ def api_markers():
                 'address': marker.Location.address,
                 'postcode': marker.Location.postcode,
                 'filter_type': marker.filter_type,
+                'creator': marker.User_id, #had to change from marker.creator to marker.User_id (<User_id> given instead of int)
             }
             for marker in markers
         ]
+
         print('sending json marker data')
+        print(marker_data)
         return jsonify(marker_data)
     except Exception as e:
         print(f"Error: {str(e)}")  # Log error to terminal

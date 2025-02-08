@@ -47,25 +47,36 @@ function fetchMarkers(query = "") {
         .then(response => response.json())
         .then(data => {
             markerClusterGroup.clearLayers();  // Clear previous markers
-
+            
             data.forEach(marker => {
                 let markerInstance = L.marker(
                     [marker.latitude, marker.longitude],
                     { icon: getMarkerIcon(marker.filter_type, marker.approved) }
                 );
-
-                markerInstance.bindPopup(`
+                //populate markers with correct data
+                let popupContent = `
                     <b>${marker.event_name}</b><br>
                     ${marker.description}<br>
                     Approved: ${marker.approved ? '✅' : '❌'}<br>
                     ${marker.website}<br>
                     ${marker.address}<br>
                     ${marker.postcode}<br>
-                    <button onclick="editMarker(${marker.id})">Edit</button>
-                    <button onclick="deleteMarker(${marker.id})">Delete</button>
-                    <button onclick="approveMarker(${marker.id})">Approve</button>
-                `);
+                `;
 
+                // add buttons if conditions met
+                if (thisUserId === marker.creator || thisUserAccessLv === 1) {
+                    popupContent += `
+                        <button onclick="editMarker(${marker.id})">Edit</button>
+                        <button onclick="deleteMarker(${marker.id})">Delete</button>
+                    `;
+                }
+                if (thisUserAccessLv === 1) {
+                    popupContent += `
+                        <button onclick="approveMarker(${marker.id})">Approve</button>
+                    `;
+                } // add 'if marker approved don't show'
+
+                markerInstance.bindPopup(popupContent);
                 markerClusterGroup.addLayer(markerInstance);
             });
 
