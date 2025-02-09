@@ -17,7 +17,7 @@ Admin_view
         <script>
             function editUser(event, userId, field) {
                 let newValue = event.target.innerText;
-                fetch('/update_user', {
+                fetch(`/update_user/${userId}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({id: userId, field: field, value: newValue})

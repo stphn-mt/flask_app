@@ -29,20 +29,18 @@ import flask_msearch
 
 
 @app.before_request
-def before_request(): # if user is logged in, record the time they log in
-    if current_user.is_authenticated:
+def before_request(): # if user is logged in, record the time they log in, update database
+    if current_user.is_authenticated: 
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
         
-
-##################################################
 def get_coordinates(postcode):
-    """Fetch latitude and longitude from Postcodes.io."""
+    # Fetch latitude and longitude from Postcodes.io
     url = f"https://api.postcodes.io/postcodes/{postcode}"
+    # assign the response of postcodes.io to a variable by http GET request function
     response = requests.get(url)
-    print('getting coordinates')
-    if response.status_code == 200:
-        data = response.json()
+    if response.status_code == 200: #if request/response successful
+        data = response.json() # convert the response to a python dictionary that is friendly for javascript
         return data["result"]["latitude"], data["result"]["longitude"]
     return None, None  # Return None if invalid postcode
 
@@ -179,10 +177,9 @@ def approve(marker_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/update_user', methods=['POST'])
-def update_user():
-    data = request.json
-    user = User.query.get(data['id'])
+@app.route('/update_user/<int:user_id>', methods=['POST'])
+def update_user(user_id): 
+    user = User.query.get(user_id)
     setattr(user, data['field'], data['value'])  # Update dynamically
     db.session.commit()
     search.update_index()
@@ -198,28 +195,6 @@ def delete_user(user_id):
     search.update_index(User)
     return jsonify({'status': 'deleted'})
 
-##################################################
-@app.route('/', methods=['GET', 'POST']) #accept data input from webpage
-@app.route('/index', methods=['GET', 'POST']) # accept “/” or “/index” as route
-@login_required
-def index():
-    form = PostForm() #display option to post something
-    if form.validate_on_submit(): # if user presses “submit” on post form
-        post = Post(body=form.post.data, author=current_user) #add a new record in the post db with the data in the form
-        db.session.add(post) #stage changes
-        db.session.commit() #commit to db
-        flash('Your post is now live!') # show user message
-        return redirect(url_for('index')) # reset the page (return back to index, which is the current page)
-    page = request.args.get('page', 1, type=int) # I THINK “page” is the key of the dict, “1” is the default value (default num of pages) unless there are more.
-    posts = db.paginate(current_user.following_posts(), page=page,
-                        per_page=app.config['POSTS_PER_PAGE'], error_out=False) #paginate the posts by page? [following_posts] [pre-configged no. of mosts per page, error out????]
-    next_url = url_for('index', page=posts.next_num) \
-        if posts.has_next else None # create next_url variable if there is one available
-    prev_url = url_for('index', page=posts.prev_num) \
-        if posts.has_prev else None # same logic
-    return render_template('index.html', title='Home', form=form,
-                           posts=posts.items, next_url=next_url,
-                           prev_url=prev_url) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
 
 @app.route('/admin-view')
 def admin_view():
@@ -241,6 +216,29 @@ def admin_view():
             return jsonify({'error': str(e)}), 500
     else:
         return redirect(url_for('index.html'))
+
+
+@app.route('/', methods=['GET', 'POST']) #accept data input from webpage
+@app.route('/index', methods=['GET', 'POST']) # accept “/” or “/index” as route
+@login_required
+def index():
+    form = PostForm() #display option to post something
+    if form.validate_on_submit(): # if user presses “submit” on post form
+        post = Post(body=form.post.data, author=current_user) #add a new record in the post db with the data in the form
+        db.session.add(post) #stage changes
+        db.session.commit() #commit to db
+        flash('Your post is now live!') # show user message
+        return redirect(url_for('index')) # reset the page (return back to index, which is the current page)
+    page = request.args.get('page', 1, type=int) # I THINK “page” is the key of the dict, “1” is the default value (default num of pages) unless there are more.
+    posts = db.paginate(current_user.following_posts(), page=page,
+                        per_page=app.config['POSTS_PER_PAGE'], error_out=False) #paginate the posts by page? [following_posts] [pre-configged no. of mosts per page, error out????]
+    next_url = url_for('index', page=posts.next_num) \
+        if posts.has_next else None # create next_url variable if there is one available
+    prev_url = url_for('index', page=posts.prev_num) \
+        if posts.has_prev else None # same logic
+    return render_template('index.html', title='Home', form=form,
+                           posts=posts.items, next_url=next_url,
+                           prev_url=prev_url) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
 
 @app.route('/explore', methods=["GET", "POST"])
 @login_required

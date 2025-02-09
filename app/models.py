@@ -150,11 +150,8 @@ class Post(db.Model):
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
-    timestamp: so.Mapped[datetime] = so.mapped_column(
-        index=True, default=lambda: datetime.now(timezone.utc))
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id, ondelete='CASCADE'),
-                                               index=True)
-
+    timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id, ondelete='CASCADE'),index=True)
     author: so.Mapped[User] = so.relationship(back_populates='posts')
 
     def __repr__(self): #provides a User-friendly description of each record in the table
@@ -189,12 +186,9 @@ class Marker(db.Model):
         back_populates="Markers",  # Links to the `User.Markers` relationship
         foreign_keys="[Marker.User_id]"
     )
-# @staticmethod
-# def reindex():
-#     search.create_index(update=True)
 
 
-# Set up models
-with app.app_context():
-    db.create_all()
-    search.create_index()
+# # Set up models
+# with app.app_context():
+#     db.create_all()
+#     search.create_index()
