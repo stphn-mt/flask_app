@@ -69,6 +69,8 @@ function fetchMarkers(query = "") {
                     ${marker.website}<br>
                     ${marker.address}<br>
                     ${marker.postcode}<br>
+                    Created by:${marker.creator_name}<br>
+                    Contact:${marker.email_to}<br>
                 `;
 
                 // add buttons if conditions met

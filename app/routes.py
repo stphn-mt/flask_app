@@ -53,7 +53,7 @@ def map():
     session.permanent = True
     if 'marker_count' not in session:
         session['marker_count'] = 0  # Initialize counter if not set
-    if session['marker_count'] <= 1:
+    if session['marker_count'] <= 5:
         if form.validate_on_submit():
             address = form.address.data
             postcode = form.postcode.data
@@ -107,7 +107,6 @@ def api_markers():
             markers = Marker.query.msearch(query, fields=['event_name', 'event_description']).all()
         else:
             markers = Marker.query.all()
-        
         marker_data = [
             {
                 'id': marker.id,
@@ -121,10 +120,12 @@ def api_markers():
                 'postcode': marker.Location.postcode,
                 'filter_type': marker.filter_type,
                 'creator': marker.User_id, #had to change from marker.creator to marker.User_id (<User_id> given instead of int)
+                'email_to': marker.creator.email,
+                'creator_name': str(marker.creator),
             }
             for marker in markers
         ]
-
+        print(marker_data)
         return jsonify(marker_data)
     except Exception as e:
         print(f"Error: {str(e)}")  # Log error to terminal
@@ -157,7 +158,7 @@ def delete_marker(marker_id):
             return jsonify({'error': 'Marker not found'}), 404
         db.session.delete(marker)
         if marker.User_id == current_user.id:
-            session['max_marker'] -= 1
+            session['marker_count'] -= 1
         db.session.commit()
         search.update_index()
         search.update_index(Marker)
@@ -279,6 +280,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
+    
     return redirect(url_for('index'))
 
 
@@ -303,8 +305,7 @@ def reset_password_request():
         return redirect(url_for('index'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
-        user = db.session.scalar(
-            sa.select(User).where(User.email == form.email.data)) # get first result from query for the user’s email
+        user = db.session.scalar(sa.select(User).where(User.email == form.email.data)) # get first result from query for the user’s email
         if user:
             send_password_reset_email(user) # if there is such an email given by the user, send an automated email
         flash('Check your email for the instructions to reset your password')

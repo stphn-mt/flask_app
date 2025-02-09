@@ -77,7 +77,7 @@ class User(UserMixin, db.Model):
         # lazy="dynamic",           # Enables efficient querying of Markers
     )
     def __repr__(self):
-        return '<User {}>'.format(self.username) # provides information in a nice format for each User
+        return self.username # provides information in a nice format for each User
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password) # applies a hashing algorithm to encrypt passwords
