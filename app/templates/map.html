@@ -17,10 +17,14 @@ Map
     <div id="map" style="width:900px; height:580px; "></div>
     <br>
     <!-- Form that will be shown after a map click -->
-    <form id="form-container" method="POST" action="{{ url_for('map') }}" style="display:none;">
+    <form id="modification-form" method="POST" action="{{ url_for('update_marker') }}" style="display:none;">
+        {{ wtf.quick_form(form2) }}
+    </form>
+
+    <form id="form-container" method="POST" action="{{ url_for('map') }}" style="display:block;">
         {{ wtf.quick_form(form) }}
     </form>
-    </div>
+
     <!-- define info about current user needed for javascript -->
     <script>
         const thisUserId = {{ user_id|tojson }}; // Extract user id 

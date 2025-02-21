@@ -76,7 +76,7 @@ function fetchMarkers(query = "") {
                 // add buttons if conditions met
                 if (thisUserId === marker.creator || thisUserAccessLv === 1) {
                     popupContent += `
-                        <button onclick="editMarker(${marker.id})">Edit</button>
+                        <button onclick="editMarker('${marker.id}', '${marker.event_name}', '${marker.description}', '${marker.filter_type}', '${marker.website}')">Edit</button>
                         <button onclick="deleteMarker(${marker.id})">Delete</button>
                     `;
                 }
@@ -96,26 +96,15 @@ function fetchMarkers(query = "") {
 }
 fetchMarkers();
 
-function editMarker(markerId) {
-    let newName = prompt("Enter new event name:");
-    let newDescription = prompt("Enter new event description:");
-    let newWebsite = prompt("Enter new website link:");
+function editMarker(markerId, eventName, description, filter_type, website) {
+    document.getElementById('modification-form').style.display = 'block'; // Show the form when modify is clicked
 
-    fetch(`/api/markers/${markerId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            event_name: newName,
-            description: newDescription,
-            website: newWebsite,
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        fetchMarkers();  // Refresh markers
-    })
-    .catch(error => console.error("Error updating marker:", error));
+    document.getElementById("marker_id").value = markerId
+    document.getElementById("mod-event_name").value = eventName; // Populate form with original marker data
+    document.getElementById("mod-description").value = description;
+    document.getElementById("mod-filter_type").value = filter_type;
+    document.getElementById("mod-website").value = website;
+
 }
 
 function deleteMarker(markerId) {
@@ -154,24 +143,3 @@ document.querySelector('form').addEventListener('submit', function (e) {
 
 // Variable to store the current marker
 var currentMarker = null;
-
-// Add a click event listener to the map
-map.on('click', function (e) {
-    var lat = e.latlng.lat;
-    var lng = e.latlng.lng;
-
-    // Remove the previous marker if it exists
-    if (currentMarker) {
-        map.removeLayer(currentMarker);
-    }
-
-    // Create a new marker and add it to the map
-    currentMarker = L.marker([lat, lng]).addTo(map);
-
-    // Store the coordinates in hidden form inputs
-    document.querySelector('[name="latitude"]').value = lat;
-    document.querySelector('[name="longitude"]').value = lng;
-
-    // Show the form
-    document.getElementById('form-container').style.display = 'block';
-});

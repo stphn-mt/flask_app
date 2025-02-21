@@ -7,7 +7,7 @@ import sqlalchemy as sa
 from app import app, db, search
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, \
-        EventForm
+        EventForm, ModifyEventForm
 from app.models import User, Post, Marker, Location
 from app.email import send_password_reset_email
 import flask_msearch
@@ -30,7 +30,9 @@ import flask_msearch
 
 @app.before_request
 def before_request(): # if user is logged in, record the time they log in, update database
+    # print("Before request triggered")  # Debugging
     if current_user.is_authenticated: 
+        # print("current_user is triggered")  # Debugging
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
         
@@ -46,8 +48,10 @@ def get_coordinates(postcode):
 
 
 @app.route('/map', methods = ["GET", "POST"])
+@login_required
 def map():
     form = EventForm()
+    form2 = ModifyEventForm()
     session.permanent = True
     if 'marker_count' not in session:
         session['marker_count'] = 0  # Initialize counter if not set
@@ -86,12 +90,12 @@ def map():
                 db.session.commit()
                 print('adding marker')
                 session['marker_count'] += 1  # Increment counter
-                return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
+                return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id, form2=form2)
             return ("Invalid postcode", 400)
 
     else:
         flash('You have reached the maximum number of markers allowed today.', 'danger')
-    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
+    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id, form2=form2)
 
 # transfer db marker data to /map and display all prev stored markers
 
@@ -99,7 +103,7 @@ def map():
 def api_markers():
     try:
         query = request.args.get('query', '')  # Get query, default to empty string
-        print(query)
+
         if query:
             print('searching')
             markers = Marker.query.msearch(query, fields=['event_name', 'event_description']).all()
@@ -129,24 +133,31 @@ def api_markers():
         print(f"Error: {str(e)}")  # Log error to terminal
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/markers/<int:marker_id>', methods=['PUT'])
-def update_marker(marker_id):
+@app.route('/api/markers/', methods=['POST'])
+def update_marker():
     try:
+        
+        marker_id = request.form.get('marker_id')
+        print(marker_id)
         marker = Marker.query.get(marker_id)
-        if not marker:
-            return jsonify({'error': 'Marker not found'}), 404
-        data = request.json
 
-        marker.event_name = data.get('event_name', marker.event_name)
-        marker.event_description = data.get('description', marker.event_description)
-        if marker.website:
-            marker.website = data.get('website', marker.website)
+        if not marker:
+            flash("Marker not found!", "danger")
+            return redirect(url_for('map'))
+
+        marker.event_name = request.form.get('event_name', marker.event_name)
+        marker.event_description = request.form.get('description', marker.event_description)
+        marker.website = request.form.get('website', marker.website)
+
         db.session.commit()
         search.update_index()
         search.update_index(Marker)
-        return jsonify({'message': 'Marker updated successfully'})
+
+        return redirect(url_for('map'))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
 
 @app.route('/api/markers/<int:marker_id>', methods=['DELETE'])
 def delete_marker(marker_id):
@@ -177,7 +188,7 @@ def approve(marker_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/update_user/<int:user_id>', methods=['POST'])
+@app.route('/update_user/<int:user_id>', methods=['POST']) # change here?
 def update_user(user_id): 
     user = User.query.get(user_id)
     setattr(user, data['field'], data['value'])  # Update dynamically
@@ -197,6 +208,7 @@ def delete_user(user_id):
 
 
 @app.route('/admin-view')
+@login_required
 def admin_view():
     if current_user.is_authenticated and current_user.access_level==1: #so that users can't try to get in from url
         try:
@@ -278,11 +290,11 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    
-    return redirect(url_for('index'))
+    session.pop("marker_count", None)
+    return redirect(url_for('login'))
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST']) #change here
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index')) #don’t let logged in users try to re-register
@@ -310,6 +322,7 @@ def reset_password_request():
         return redirect(url_for('login'))
     return render_template('reset_password_request.html',
                            title='Reset Password', form=form) # refresh the page if incorrectly filled in form
+
 
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -346,7 +359,7 @@ def user(username):
                            next_url=next_url, prev_url=prev_url, form=form)
 
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
+@app.route('/edit_profile', methods=['GET', 'POST']) # change ehre
 @login_required
 def edit_profile():
     form = EditProfileForm(current_user.username)
@@ -361,7 +374,6 @@ def edit_profile():
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
-
 
 @app.route('/follow/<username>', methods=['POST'])
 @login_required

@@ -152,7 +152,7 @@ class Post(db.Model):
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
     timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id, ondelete='CASCADE'),index=True)
-    author: so.Mapped[User] = so.relationship(back_populates='posts')
+    author: so.Mapped[User] = so.relationship(back_populates='posts', passive_deletes=True)
 
     def __repr__(self): #provides a User-friendly description of each record in the table
         return '<Post {}>'.format(self.body)

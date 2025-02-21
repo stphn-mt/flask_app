@@ -14,7 +14,7 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['stevejameson238@gmail.com']
-    POSTS_PER_PAGE = 25
+    POSTS_PER_PAGE = 5
     MSEARCH_INDEX_NAME = 'msearch'  # Name of the index directory
     MSEARCH_BACKEND = 'whoosh'  # Can also be 'sphinx' or 'elasticsearch'
     MSEARCH_ENABLE = True

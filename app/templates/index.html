@@ -7,7 +7,9 @@
     {{ wtf.quick_form(form) }}
     {% endif %}
     {% for post in posts %}
-        {% include '_post.html' %}
+        {% if post.author != None %}
+            {% include '_post.html' %}
+        {% endif %}
     {% endfor %}
     <nav aria-label="Post navigation">
         <ul class="pagination">

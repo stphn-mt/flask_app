@@ -7,7 +7,20 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, \
 import sqlalchemy as sa
 from app import db
 from app.models import User
+import re
 
+
+def is_strong_password(form, password):
+    if len(password.data) < 8:
+        raise ValidationError('Password must be atleast 8 characters')
+    elif not re.search("[a-z]", password.data):
+        raise ValidationError('Password must contain at least one lowercase letter')
+    elif not re.search("[A-Z]", password.data):
+        raise ValidationError('Password must contain at least one uppercase letter')
+    elif not re.search("[0-9]", password.data):
+        raise ValidationError('Password must contain at least one number')
+    elif not re.search("[!@£$%^&*]", password.data):
+        raise ValidationError('Password must contain at least one special character: !@£$%^&* ')
 
 
 class EventForm(FlaskForm):
@@ -23,9 +36,19 @@ class EventForm(FlaskForm):
     longitude = HiddenField('Longitude', render_kw={"id": "longitude"})
     submit = SubmitField('Submit')
 
+class ModifyEventForm(FlaskForm):
+    marker_id = HiddenField('marker_id', validators=[DataRequired()], render_kw={"id": "marker_id"})
+    event_name = StringField('Event Name', validators=[DataRequired()], render_kw= {"id": "mod-event_name"})
+    filter_type = SelectField('Filters', choices=[('Sport', 'Sport'), ('Club','Club'),
+     ('Support', 'Support'), ('Children','Children'), ('Other', 'Other'),], render_kw= {"id": "mod-filter_type"})
+    description = TextAreaField('Description', validators=[DataRequired()], render_kw= {"id": "mod-description"})
+    website = URLField('Website', render_kw= {"id": "mod-website"})
+    submit = SubmitField('Submit')
+
 class LoginForm(FlaskForm): #to create a form, inherit from Flask’s FlaskForm 
     username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()],render_kw={"id": "password"})
+    show_password = BooleanField('Show password', render_kw={"id": "check"})
     remember_me = BooleanField('Remember Me') #check box “remember me”
     submit = SubmitField('Sign In')
 
@@ -33,10 +56,11 @@ class LoginForm(FlaskForm): #to create a form, inherit from Flask’s FlaskForm
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), is_strong_password], render_kw={"id": "Password"})
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(),
-                                           EqualTo('password')])
+                                       EqualTo('password')], render_kw={"id": "Confirm_password"})  # Fix here
+    show_password = BooleanField('Show password', render_kw={"id": "Check"})
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -44,6 +68,9 @@ class RegistrationForm(FlaskForm):
             User.username == username.data)) #get first match in db
         if user is not None:
             raise ValidationError('Please use a different username.') #if there is already a user with this username in the db, raise error
+        tempstring = username.data.replace("_", "")
+        if tempstring.isalnum() == False:
+            raise ValidationError('Username can only contain alphanumeric characters and underscores.')
 
     def validate_email(self, email):
         user = db.session.scalar(sa.select(User).where(
@@ -58,10 +85,11 @@ class ResetPasswordRequestForm(FlaskForm): #”forgot you password?” option, s
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), is_strong_password], render_kw={"id": "Password"})
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(),
-                                           EqualTo('password')])
+                                       EqualTo('password')], render_kw={"id": "Confirm_password"})  # Fix here
+    show_password = BooleanField('Show password', render_kw={"id": "Check"})
     submit = SubmitField('Request Password Reset')
 
 
@@ -81,6 +109,10 @@ class EditProfileForm(FlaskForm):
                 User.username == username.data))
             if user is not None:
                 raise ValidationError('Please use a different username.')
+            tempstring = username.data.replace("_", "")
+            if tempstring.isalnum() == False:
+                raise ValidationError('Username can only contain alphanumeric characters and underscores.')
+
 
 
 class EmptyForm(FlaskForm):
