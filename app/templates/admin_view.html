@@ -16,7 +16,13 @@ Admin_view
         <title>User Management</title>
         <script>
             function editUser(event, userId, field) {
-                let newValue = event.target.innerText;
+                let newValue = event.target.innerText.trim();
+                let originalValue = event.target.getAttribute("data-original");
+                
+                if (newValue === originalValue) return; // Prevent unnecessary requests
+                
+                event.target.setAttribute("data-original", newValue);
+                
                 fetch(`/update_user/${userId}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -34,6 +40,16 @@ Admin_view
                         }
                     });
             }
+
+            function promoteUser(userId) {
+                fetch(`/promote_user/${userId}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'promoted') {
+                            location.reload();
+                        }
+                    });
+            }
         </script>
     </head>
     <body>
@@ -44,38 +60,19 @@ Admin_view
                 <th>Name</th>
                 <th>Email</th>
                 <th>Level</th>
+                <th>Promote</th>
                 <th>Delete</th>
             </tr>
             {% for user in users %}
             <tr>
                 <td>{{ user.id }}</td>
-                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'name')">{{ user.username }}</td>
-                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'email')">{{ user.email }}</td>
-                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'email')">{% if user.access_level ==1 %}Admin{% else %}User{% endif %}</td>
+                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'name')" data-original="{{ user.username }}">{{ user.username }}</td>
+                <td contenteditable="true" onblur="editUser(event, {{ user.id }}, 'email')" data-original="{{ user.email }}">{{ user.email }}</td>
+                <td>{% if user.access_level == 1 %}Admin{% else %}User{% endif %}</td>
+                <td><button onclick="promoteUser({{ user.id }})">Promote</button></td>
                 <td><button onclick="deleteUser({{ user.id }}, this.parentNode.parentNode)">Delete</button></td>
             </tr>
             {% endfor %}
-    </table>
-            <!-- note - can use current_user or load_user to get id more cleanly??-->
-            <!-- Marker Table -->
-            <div>
-                <h2>Event Management</h2>
-                <table>
-                    {% for marker in markers %}
-                    <tr>
-                        <strong>{{ marker.event_name }}</strong> <br>
-                        
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            
-            <script>
-            function toggleOptions(itemId) {
-                const optionsDiv = document.getElementById(`options-${itemId}`);
-                optionsDiv.style.display = optionsDiv.style.display === 'none' ? 'block' : 'none';
-            }
-            </script>
-        </div>
+        </table>
     </body>
 {% endblock %}

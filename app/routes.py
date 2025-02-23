@@ -27,7 +27,6 @@ import flask_msearch
 #     db.session.commit()
 
 
-
 @app.before_request
 def before_request(): # if user is logged in, record the time they log in, update database
     # print("Before request triggered")  # Debugging
@@ -106,7 +105,7 @@ def api_markers():
 
         if query:
             print('searching')
-            markers = Marker.query.msearch(query, fields=['event_name', 'event_description']).all()
+            markers = Marker.query.msearch(query, fields=['event_name', 'event_description', 'User_id', 'filter_type']).all()
         else:
             markers = Marker.query.all()
         marker_data = [
@@ -158,7 +157,6 @@ def update_marker():
         return jsonify({'error': str(e)}), 500
 
 
-
 @app.route('/api/markers/<int:marker_id>', methods=['DELETE'])
 def delete_marker(marker_id):
     try:
@@ -188,14 +186,14 @@ def approve(marker_id):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/update_user/<int:user_id>', methods=['POST']) # change here?
-def update_user(user_id): 
-    user = User.query.get(user_id)
-    setattr(user, data['field'], data['value'])  # Update dynamically
-    db.session.commit()
-    search.update_index()
-    search.update_index(User)
-    return jsonify({'status': 'success'})
+# @app.route('/update_user/<int:user_id>', methods=['POST']) # change here?
+# def update_user(user_id): 
+    # user = User.query.get(user_id)
+    # setattr(user, data['field'], data['value'])  # Update dynamically
+    # db.session.commit()
+    # search.update_index()
+    # search.update_index(User)
+    # return jsonify({'status': 'success'})
 
 @app.route('/delete_user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
@@ -207,27 +205,54 @@ def delete_user(user_id):
     return jsonify({'status': 'deleted'})
 
 
+# Flask route updates:
 @app.route('/admin-view')
 @login_required
 def admin_view():
-    if current_user.is_authenticated and current_user.access_level==1: #so that users can't try to get in from url
+    if current_user.is_authenticated and current_user.access_level == 1:
         try:
-            query = request.args.get('query', '')  # Get query, default to empty string
-            print(query)
+            query = request.args.get('query', '')
             if query:
-                print('searching')
                 user_data = User.query.msearch(query, fields=['username', 'email']).all()
             else:
                 user_data = User.query.all()
-            marker_data = Marker.query.all()  # Fetch all markers
-            print(user_data, marker_data)
-            # Pass data to the template
+            marker_data = Marker.query.all()
             return render_template('admin_view.html', users=user_data, markers=marker_data)
         except Exception as e:
-            print(f"Error: {str(e)}")  # Log error to terminal
+            print(f"Error: {str(e)}")
             return jsonify({'error': str(e)}), 500
     else:
         return redirect(url_for('index.html'))
+
+@app.route('/promote_user/<int:user_id>', methods=['POST'])
+@login_required
+def promote_user(user_id):
+    if current_user.access_level != 1:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    user = User.query.get(user_id)
+    if user:
+        user.access_level = 1
+        db.session.commit()
+        return jsonify({'status': 'promoted'})
+    return jsonify({'error': 'User not found'}), 404
+
+@app.route('/update_user/<int:user_id>', methods=['POST'])
+@login_required
+def update_user(user_id):
+    if current_user.access_level != 1:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    data = request.get_json()
+    if not data or 'field' not in data or 'value' not in data:
+        return jsonify({'error': 'Invalid data'}), 400
+    
+    user = User.query.get(user_id)
+    if user:
+        setattr(user, data['field'], data['value'])
+        db.session.commit()
+        return jsonify({'status': 'updated'})
+    return jsonify({'error': 'User not found'}), 404
 
 
 @app.route('/', methods=['GET', 'POST']) #accept data input from webpage
@@ -241,32 +266,70 @@ def index():
         db.session.commit() #commit to db
         flash('Your post is now live!') # show user message
         return redirect(url_for('index')) # reset the page (return back to index, which is the current page)
+
     page = request.args.get('page', 1, type=int) # I THINK “page” is the key of the dict, “1” is the default value (default num of pages) unless there are more.
     posts = db.paginate(current_user.following_posts(), page=page,
-                        per_page=app.config['POSTS_PER_PAGE'], error_out=False) #paginate the posts by page? [following_posts] [pre-configged no. of mosts per page, error out????]
+                        per_page=app.config['POSTS_PER_PAGE'], error_out=False) #paginate the posts by page? [following_posts] [pre-configged no. of mosts per page]
     next_url = url_for('index', page=posts.next_num) \
         if posts.has_next else None # create next_url variable if there is one available
     prev_url = url_for('index', page=posts.prev_num) \
         if posts.has_prev else None # same logic
     return render_template('index.html', title='Home', form=form,
                            posts=posts.items, next_url=next_url,
-                           prev_url=prev_url) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
+                           prev_url=prev_url, user_id = current_user.id) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
 
 @app.route('/explore', methods=["GET", "POST"])
 @login_required
 def explore():
-    page = request.args.get('page', 1, type=int)
-    query = sa.select(Post).order_by(Post.timestamp.desc())
-    posts = db.paginate(query, page=page,
+    user_asks = request.args.get('query', '').strip() #look for submitted search query to filter database by
+    page = request.args.get('page', 1, type=int) # just moved inside edit zone, get the page we are at
+    if user_asks: # if there is a query
+        search_results = search_posts_and_users(user_asks) # filter the search for the query
+        total = len(search_results)
+        posts = search_results[(page - 1) * app.config['POSTS_PER_PAGE']: page * app.config['POSTS_PER_PAGE']] 
+        next_url = url_for('explore', page=page + 1) if page * app.config['POSTS_PER_PAGE'] < total else None
+        prev_url = url_for('explore', page=page - 1) if page > 1 else None
+        return render_template('index.html', title='Explore', posts=posts, next_url=next_url, prev_url=prev_url)
+    else:
+        all_posts = sa.select(Post).order_by(Post.timestamp.desc()) # get all posts in descending order of time
+        posts = db.paginate(all_posts, page=page,
                         per_page=app.config['POSTS_PER_PAGE'], error_out=False) # paginate posts, with descending order of time
-    next_url = url_for('explore', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('explore', page=posts.prev_num) \
-        if posts.has_prev else None
-    return render_template('index.html', title='Explore',
-                           posts=posts.items, next_url=next_url,
-                           prev_url=prev_url)
+        next_url = url_for('explore', page=posts.next_num) \
+            if posts.has_next else None
+        prev_url = url_for('explore', page=posts.prev_num) \
+            if posts.has_prev else None
 
+        return render_template('index.html', title='Explore',
+                           posts=posts.items, next_url=next_url,
+                           prev_url=prev_url, user_id = current_user.id)
+
+def search_posts_and_users(query):
+    # full-text-search posts 
+    post_results = Post.query.msearch(query, fields=['body']).all()
+    # full-text-search users 
+    user_results = User.query.msearch(query, fields=['username']).all()
+    # if found matching user, get their posts
+    user_posts = []
+    if user_results:
+        user_posts = Post.query.filter(Post.user_id.in_([user.id for user in user_results])).all()
+    # Combine results & remove duplicates (use a set for unique post IDs)
+    all_posts = {post.id: post for post in (post_results + user_posts)}.values()
+    return list(all_posts)  # return list to manually paginate
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    
+    if current_user.id != post.author.id and not current_user.access_level == 1:
+        flash("You are not authorized to delete this post.", "danger")
+        return redirect(url_for('index'))
+
+    db.session.delete(post)
+    db.session.commit()
+    flash("Post deleted successfully.", "success")
+    
+    return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

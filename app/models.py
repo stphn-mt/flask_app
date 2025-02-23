@@ -38,7 +38,7 @@ followers = sa.Table(
 
 class User(UserMixin, db.Model):
     __tablename__ = "User"
-    __searchable__ = ['username', 'email']
+    __searchable__ = ['username', 'email',]
     id: so.Mapped[int] = so.mapped_column(primary_key=True) # so.Mapped gives a python data type to the attr, so.mapped_column creates the actual column
 
     access_level: so.Mapped[int] = so.mapped_column(
@@ -183,7 +183,7 @@ class Marker(db.Model):
     # Relationship to User
     creator: so.Mapped["User"] = so.relationship(
         "User",
-        back_populates="Markers",  # Links to the `User.Markers` relationship
+        back_populates="Markers",  # Links to the User.Markers relationship
         foreign_keys="[Marker.User_id]"
     )
 

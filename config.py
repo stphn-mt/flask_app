@@ -17,5 +17,9 @@ class Config:
     POSTS_PER_PAGE = 5
     MSEARCH_INDEX_NAME = 'msearch'  # Name of the index directory
     MSEARCH_BACKEND = 'whoosh'  # Can also be 'sphinx' or 'elasticsearch'
+    MSEARCH_EXTRA_SETTINGS = {"schema": {
+        "content": "TEXT(stored=True, sortable=True, field_boost=2.0, analyzer=None)"
+    }
+}
     MSEARCH_ENABLE = True
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
