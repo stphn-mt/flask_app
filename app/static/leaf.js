@@ -14,8 +14,6 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-// //////////////////////////////
-// This should work now with the data passed from Flask
 // Fetch marker data from the Flask API
 // Define marker icons based on filter_type
 function getMarkerIcon(filterType, approved) {
@@ -57,10 +55,21 @@ function fetchMarkers(query = "") {
             markerClusterGroup.clearLayers();  // Clear previous markers
             
             data.forEach(marker => {
+                // Check if the marker should be visible
+                const isVisible = marker.approved || thisUserId === marker.creator || thisUserAccessLv === 1;
+
+                // If the marker isn't visible, set opacity to 0 (or skip adding it to the map)
                 let markerInstance = L.marker(
                     [marker.latitude, marker.longitude],
-                    { icon: getMarkerIcon(marker.filter_type, marker.approved) }
+                    {
+                        icon: getMarkerIcon(marker.filter_type, marker.approved),
+                        opacity: isVisible ? 1 : 0  // Hide the marker if user shouldn't see it
+                    }
                 );
+
+                if (!isVisible) {
+                    return;  // Skip adding the marker if it shouldn't be visible
+                }
                 //populate markers with correct data
                 let popupContent = `
                     <b>${marker.event_name}</b><br>
@@ -76,7 +85,7 @@ function fetchMarkers(query = "") {
                 // add buttons if conditions met
                 if (thisUserId === marker.creator || thisUserAccessLv === 1) {
                     popupContent += `
-                        <button onclick="editMarker('${marker.id}', '${marker.event_name}', '${marker.description}', '${marker.filter_type}', '${marker.website}')">Edit</button>
+                        <button onclick="editMarker(${marker.id}, '${marker.event_name.replace(/'/g, "\\'")}', '${marker.description.replace(/'/g, "\\'")}', '${marker.filter_type.replace(/'/g, "\\'")}', '${marker.website.replace(/'/g, "\\'")}')">Edit</button>
                         <button onclick="deleteMarker(${marker.id})">Delete</button>
                     `;
                 }
@@ -97,14 +106,14 @@ function fetchMarkers(query = "") {
 fetchMarkers();
 
 function editMarker(markerId, eventName, description, filter_type, website) {
+    console.log("Editing markers from:", markerId);  // Debugging
     document.getElementById('modification-form').style.display = 'block'; // Show the form when modify is clicked
 
-    document.getElementById("marker_id").value = markerId
-    document.getElementById("mod-event_name").value = eventName; // Populate form with original marker data
-    document.getElementById("mod-description").value = description;
-    document.getElementById("mod-filter_type").value = filter_type;
-    document.getElementById("mod-website").value = website;
-
+    document.getElementById('marker_id').value = markerId;
+    document.getElementById('mod-event_name').value = eventName; // Populate form with original marker data
+    document.getElementById('mod-description').value = description;
+    document.getElementById('mod-filter_type').value = filter_type;
+    document.getElementById('mod-website').value = website;
 }
 
 function deleteMarker(markerId) {

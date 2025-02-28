@@ -6,7 +6,7 @@ Map
 
 {% block content %}
     <h4>Search</h4>
-        <form class="form-inline" method="GET" action="api/markers">
+        <form class="form-inline" method="GET" action="/api/markers">
             <div class="form-group">
                 <label for="query">Name</label>
                 <input type="text" class="form-control" name="query" id="query">
@@ -18,10 +18,12 @@ Map
     <br>
     <!-- Form that will be shown after a map click -->
     <form id="modification-form" method="POST" action="{{ url_for('update_marker') }}" style="display:none;">
+        <h4>Edit event</h4>
         {{ wtf.quick_form(form2) }}
     </form>
 
     <form id="form-container" method="POST" action="{{ url_for('map') }}" style="display:block;">
+        <h4>Create a new event</h4>
         {{ wtf.quick_form(form) }}
     </form>
 

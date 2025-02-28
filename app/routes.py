@@ -11,6 +11,7 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
 from app.models import User, Post, Marker, Location
 from app.email import send_password_reset_email
 import flask_msearch
+
 # with app.app_context(): #clears my database of all data!
 #     def clear_data(session):
 #         meta = db.metadata
@@ -54,7 +55,7 @@ def map():
     session.permanent = True
     if 'marker_count' not in session:
         session['marker_count'] = 0  # Initialize counter if not set
-    if session['marker_count'] <= 5:
+    if session['marker_count'] <= 1:
         if form.validate_on_submit():
             address = form.address.data
             postcode = form.postcode.data
@@ -164,7 +165,7 @@ def delete_marker(marker_id):
         if not marker:
             return jsonify({'error': 'Marker not found'}), 404
         db.session.delete(marker)
-        if marker.User_id == current_user.id:
+        if marker.User_id == current_user.id and session['marker_count'] > 0:
             session['marker_count'] -= 1
         db.session.commit()
         search.update_index()
@@ -304,17 +305,26 @@ def explore():
                            prev_url=prev_url, user_id = current_user.id)
 
 def search_posts_and_users(query):
-    # full-text-search posts 
     post_results = Post.query.msearch(query, fields=['body']).all()
-    # full-text-search users 
     user_results = User.query.msearch(query, fields=['username']).all()
-    # if found matching user, get their posts
-    user_posts = []
-    if user_results:
-        user_posts = Post.query.filter(Post.user_id.in_([user.id for user in user_results])).all()
-    # Combine results & remove duplicates (use a set for unique post IDs)
-    all_posts = {post.id: post for post in (post_results + user_posts)}.values()
-    return list(all_posts)  # return list to manually paginate
+
+    # Extract user IDs from matched users
+    user_ids = []
+    for result in user_results:
+        user_ids.append(result.id)
+
+    # Get posts by those users
+    if user_ids:
+        user_posts = Post.query.filter(Post.user_id.in_(user_ids)).all()
+    else:
+        user_posts = []
+
+    # Remove duplicates using a dictionary
+    unique_posts = {}
+    for post in post_results + user_posts:
+        unique_posts[post.id] = post  # Keep only the latest occurrence
+
+    return list(unique_posts.values())  # Convert back to list for pagination
 
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
 @login_required
@@ -429,12 +439,14 @@ def edit_profile():
     if form.validate_on_submit(): #If the user changes and submits data on their profile, save their changes
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
+        current_user.email = form.email.data
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('edit_profile'))
     elif request.method == 'GET': # if user goes onto the edit_profile page, fill in the form with their current data
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
+        form.email.data = current_user.email
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
