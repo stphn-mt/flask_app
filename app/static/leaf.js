@@ -17,14 +17,16 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Fetch marker data from the Flask API
 // Define marker icons based on filter_type
 function getMarkerIcon(filterType, approved) {
-    let iconClass = "fa-solid "; // Base FontAwesome class
+    let iconClass = "fa-solid "; // need to have base class to put other icons on top of.
 
     if (filterType === "Sport") {
         iconClass += "fa-person-running";
     } else if (filterType === "Support") {
-        iconClass += "fa-plus";
+        iconClass += "fa-hand-holding-heart";
     } else if (filterType === "Club") {
         iconClass += "fa-home";
+    } else if (filterType === "Children") {
+        iconClass += "fa-child-reaching";
     } else {
         iconClass += "fa-map-marker-alt"; // Default marker
     }

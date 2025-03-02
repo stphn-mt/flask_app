@@ -36,8 +36,7 @@ def before_request(): # if user is logged in, record the time they log in, updat
         current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
         
-def get_coordinates(postcode):
-    # Fetch latitude and longitude from Postcodes.io
+def get_coordinates(postcode):# Fetch latitude and longitude from Postcodes.io
     url = f"https://api.postcodes.io/postcodes/{postcode}"
     # assign the response of postcodes.io to a variable by http GET request function
     response = requests.get(url)
@@ -47,7 +46,7 @@ def get_coordinates(postcode):
     return None, None  # Return None if invalid postcode
 
 
-@app.route('/map', methods = ["GET", "POST"])
+@app.route('/map', methods = ["GET", "POST"]) #handle map and creating/modifying markers
 @login_required
 def map():
     form = EventForm()
@@ -99,7 +98,7 @@ def map():
 
 # transfer db marker data to /map and display all prev stored markers
 
-@app.route('/api/markers')
+@app.route('/api/markers') # handle rendering correct markers based on search-filter or no search-filter
 def api_markers():
     try:
         query = request.args.get('query', '')  # Get query, default to empty string
@@ -133,7 +132,7 @@ def api_markers():
         print(f"Error: {str(e)}")  # Log error to terminal
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/markers/', methods=['POST'])
+@app.route('/api/markers/', methods=['POST']) # handle modifying markers from modify form in map view
 def update_marker():
     try:
         
@@ -158,7 +157,7 @@ def update_marker():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/markers/<int:marker_id>', methods=['DELETE'])
+@app.route('/api/markers/<int:marker_id>', methods=['DELETE']) # handle deleting markers in map view
 def delete_marker(marker_id):
     try:
         marker = Marker.query.get(marker_id)
@@ -174,8 +173,8 @@ def delete_marker(marker_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/approve/<int:marker_id>', methods=['PUT'])
-def approve(marker_id):
+@app.route('/approve/<int:marker_id>', methods=['PUT']) # handle approving markers in map view
+def approve(marker_id): 
     try:
         marker = Marker.query.get(marker_id)
         if not marker:
@@ -186,17 +185,7 @@ def approve(marker_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-# @app.route('/update_user/<int:user_id>', methods=['POST']) # change here?
-# def update_user(user_id): 
-    # user = User.query.get(user_id)
-    # setattr(user, data['field'], data['value'])  # Update dynamically
-    # db.session.commit()
-    # search.update_index()
-    # search.update_index(User)
-    # return jsonify({'status': 'success'})
-
-@app.route('/delete_user/<int:user_id>', methods=['DELETE'])
+@app.route('/delete_user/<int:user_id>', methods=['DELETE']) # handle deleting users in admin view
 def delete_user(user_id):
     user = User.query.get(user_id)
     db.session.delete(user)
@@ -207,7 +196,7 @@ def delete_user(user_id):
 
 
 # Flask route updates:
-@app.route('/admin-view')
+@app.route('/admin-view') # show table of all users and handle search queries
 @login_required
 def admin_view():
     if current_user.is_authenticated and current_user.access_level == 1:
@@ -225,7 +214,7 @@ def admin_view():
     else:
         return redirect(url_for('index.html'))
 
-@app.route('/promote_user/<int:user_id>', methods=['POST'])
+@app.route('/promote_user/<int:user_id>', methods=['POST']) # handle promoting users in admin view
 @login_required
 def promote_user(user_id):
     if current_user.access_level != 1:
@@ -238,7 +227,7 @@ def promote_user(user_id):
         return jsonify({'status': 'promoted'})
     return jsonify({'error': 'User not found'}), 404
 
-@app.route('/update_user/<int:user_id>', methods=['POST'])
+@app.route('/update_user/<int:user_id>', methods=['POST']) # handle updating user info in admin view
 @login_required
 def update_user(user_id):
     if current_user.access_level != 1:
@@ -279,7 +268,7 @@ def index():
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url, user_id = current_user.id) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
 
-@app.route('/explore', methods=["GET", "POST"])
+@app.route('/explore', methods=["GET", "POST"]) # webpage for finding new organisers to follow
 @login_required
 def explore():
     user_asks = request.args.get('query', '').strip() #look for submitted search query to filter database by
@@ -304,7 +293,7 @@ def explore():
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url, user_id = current_user.id)
 
-def search_posts_and_users(query):
+def search_posts_and_users(query): # function that allows search by username with flask-msearch
     post_results = Post.query.msearch(query, fields=['body']).all()
     user_results = User.query.msearch(query, fields=['username']).all()
 
@@ -321,27 +310,25 @@ def search_posts_and_users(query):
 
     # Remove duplicates using a dictionary
     unique_posts = {}
-    for post in post_results + user_posts:
+    for post in (post_results + user_posts):
         unique_posts[post.id] = post  # Keep only the latest occurrence
 
     return list(unique_posts.values())  # Convert back to list for pagination
 
-@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@app.route('/delete_post/<int:post_id>', methods=['POST']) # deletes post on explore/home/profile
 @login_required
 def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    
+    post = Post.query.get_or_404(post_id) #query for the first matching result in db, otherwise return a 404 error
     if current_user.id != post.author.id and not current_user.access_level == 1:
         flash("You are not authorized to delete this post.", "danger")
         return redirect(url_for('index'))
-
     db.session.delete(post)
     db.session.commit()
     flash("Post deleted successfully.", "success")
     
     return redirect(url_for('index'))
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST']) #provides form and redirect to page user tried to access
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index')) # if user already logged in, redirect to index (home) page
@@ -360,14 +347,14 @@ def login():
     return render_template('login.html', title='Sign In', form=form) # if form is invalid (required inputs missing) then refresh.
 
 
-@app.route('/logout')
+@app.route('/logout') #pops user session and logs out.
 def logout():
     logout_user()
     session.pop("marker_count", None)
     return redirect(url_for('login'))
 
 
-@app.route('/register', methods=['GET', 'POST']) #change here
+@app.route('/register', methods=['GET', 'POST']) #adds user to db
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index')) #don’t let logged in users try to re-register
@@ -382,7 +369,7 @@ def register():
     return render_template('register.html', title='Register', form=form) # if required inputs not given, refresh page
 
 
-@app.route('/reset_password_request', methods=['GET', 'POST'])
+@app.route('/reset_password_request', methods=['GET', 'POST']) #Let's user request a password reset by entering email from login page
 def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -398,7 +385,7 @@ def reset_password_request():
 
 
 
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+@app.route('/reset_password/<token>', methods=['GET', 'POST']) # Webpage to reset password using token from email
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -414,7 +401,7 @@ def reset_password(token):
     return render_template('reset_password.html', form=form)
 
 
-@app.route('/user/<username>')
+@app.route('/user/<username>') # view other user profiles for follow/unfollow
 @login_required
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username)) #get the matching user otherwise return a 404 invalid page error
@@ -432,7 +419,7 @@ def user(username):
                            next_url=next_url, prev_url=prev_url, form=form)
 
 
-@app.route('/edit_profile', methods=['GET', 'POST']) # change ehre
+@app.route('/edit_profile', methods=['GET', 'POST']) #allows user to modify info about themselves for others to see.
 @login_required
 def edit_profile():
     form = EditProfileForm(current_user.username)
@@ -450,7 +437,7 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
-@app.route('/follow/<username>', methods=['POST'])
+@app.route('/follow/<username>', methods=['POST']) # allows follow of users
 @login_required
 def follow(username):
     form = EmptyForm() #provides a button to submit
@@ -471,22 +458,28 @@ def follow(username):
         return redirect(url_for('index'))
 
 
-@app.route('/unfollow/<username>', methods=['POST'])
+@app.route('/unfollow/<username>', methods=['POST']) # allows unfollow of users
 @login_required
 def unfollow(username):
     form = EmptyForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit(): #if clicked unfollow, get the user from the database to unfollow
         user = db.session.scalar(
             sa.select(User).where(User.username == username))
-        if user is None:
+        if user is None: #Check if the user trying to be unfollowed exists
             flash(f'User {username} not found.')
             return redirect(url_for('index'))
-        if user == current_user:
+        if user == current_user: #Check if user is trying to unfollow themselves
             flash('You cannot unfollow yourself!')
             return redirect(url_for('user', username=username))
-        current_user.unfollow(user)
+        current_user.unfollow(user) #If pass all checks, unfollow user, flash confirmation message.
         db.session.commit()
         flash(f'You are not following {username}.')
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('index'))
+
+
+
+'''
+ADD DELETE BUTTON ON USER PROFILES
+'''
