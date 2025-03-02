@@ -1,14 +1,14 @@
-from datetime import datetime, timezone
-import requests
-from urllib.parse import urlsplit
 from flask import render_template, flash, redirect, url_for, request, g, jsonify, abort, session
-from flask_login import login_user, logout_user, current_user, login_required
-import sqlalchemy as sa
-from app import app, db, search
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm, \
         EventForm, ModifyEventForm
+from app import app, db, search
+import sqlalchemy as sa
 from app.models import User, Post, Marker, Location
+from flask_login import login_user, logout_user, current_user, login_required
+import requests
+from datetime import datetime, timezone
+from urllib.parse import urlsplit
 from app.email import send_password_reset_email
 import flask_msearch
 
@@ -47,11 +47,13 @@ def get_coordinates(postcode):# Fetch latitude and longitude from Postcodes.io
 
 
 @app.route('/map', methods = ["GET", "POST"]) #handle map and creating/modifying markers
-@login_required
 def map():
     form = EventForm()
     form2 = ModifyEventForm()
     session.permanent = True
+    if current_user.is_anonymous:
+        current_user.access_level = 0
+        return render_template('map.html')
     if 'marker_count' not in session:
         session['marker_count'] = 0  # Initialize counter if not set
     if session['marker_count'] <= 1:
@@ -149,8 +151,8 @@ def update_marker():
         marker.website = request.form.get('website', marker.website)
 
         db.session.commit()
-        search.update_index()
-        search.update_index(Marker)
+        search.update_noticeboard()
+        search.update_noticeboard(Marker)
 
         return redirect(url_for('map'))
     except Exception as e:
@@ -167,8 +169,8 @@ def delete_marker(marker_id):
         if marker.User_id == current_user.id and session['marker_count'] > 0:
             session['marker_count'] -= 1
         db.session.commit()
-        search.update_index()
-        search.update_index(Marker)
+        search.update_noticeboard()
+        search.update_noticeboard(Marker)
         return jsonify({'message': 'Marker deleted successfully'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -190,8 +192,8 @@ def delete_user(user_id):
     user = User.query.get(user_id)
     db.session.delete(user)
     db.session.commit()
-    search.update_index()
-    search.update_index(User)
+    search.update_noticeboard()
+    search.update_noticeboard(User)
     return jsonify({'status': 'deleted'})
 
 
@@ -212,7 +214,7 @@ def admin_view():
             print(f"Error: {str(e)}")
             return jsonify({'error': str(e)}), 500
     else:
-        return redirect(url_for('index.html'))
+        return redirect(url_for('noticeboard.html'))
 
 @app.route('/promote_user/<int:user_id>', methods=['POST']) # handle promoting users in admin view
 @login_required
@@ -246,27 +248,27 @@ def update_user(user_id):
 
 
 @app.route('/', methods=['GET', 'POST']) #accept data input from webpage
-@app.route('/index', methods=['GET', 'POST']) # accept “/” or “/index” as route
+@app.route('/noticeboard', methods=['GET', 'POST']) # accept “/” or “/noticeboard” as route
 @login_required
-def index():
+def noticeboard():
     form = PostForm() #display option to post something
     if form.validate_on_submit(): # if user presses “submit” on post form
         post = Post(body=form.post.data, author=current_user) #add a new record in the post db with the data in the form
         db.session.add(post) #stage changes
         db.session.commit() #commit to db
         flash('Your post is now live!') # show user message
-        return redirect(url_for('index')) # reset the page (return back to index, which is the current page)
+        return redirect(url_for('noticeboard')) # reset the page (return back to noticeboard, which is the current page)
 
     page = request.args.get('page', 1, type=int) # I THINK “page” is the key of the dict, “1” is the default value (default num of pages) unless there are more.
     posts = db.paginate(current_user.following_posts(), page=page,
                         per_page=app.config['POSTS_PER_PAGE'], error_out=False) #paginate the posts by page? [following_posts] [pre-configged no. of mosts per page]
-    next_url = url_for('index', page=posts.next_num) \
+    next_url = url_for('noticeboard', page=posts.next_num) \
         if posts.has_next else None # create next_url variable if there is one available
-    prev_url = url_for('index', page=posts.prev_num) \
+    prev_url = url_for('noticeboard', page=posts.prev_num) \
         if posts.has_prev else None # same logic
-    return render_template('index.html', title='Home', form=form,
+    return render_template('noticeboard.html', title='Noticeboard', form=form,
                            posts=posts.items, next_url=next_url,
-                           prev_url=prev_url, user_id = current_user.id) # render index.html, with title home, form = postform, list of paginated posts, and next/prev otions
+                           prev_url=prev_url, user_id = current_user.id) # render noticeboard.html, with title home, form = postform, list of paginated posts, and next/prev otions
 
 @app.route('/explore', methods=["GET", "POST"]) # webpage for finding new organisers to follow
 @login_required
@@ -279,7 +281,7 @@ def explore():
         posts = search_results[(page - 1) * app.config['POSTS_PER_PAGE']: page * app.config['POSTS_PER_PAGE']] 
         next_url = url_for('explore', page=page + 1) if page * app.config['POSTS_PER_PAGE'] < total else None
         prev_url = url_for('explore', page=page - 1) if page > 1 else None
-        return render_template('index.html', title='Explore', posts=posts, next_url=next_url, prev_url=prev_url)
+        return render_template('noticeboard.html', title='Explore', posts=posts, next_url=next_url, prev_url=prev_url, user_id = current_user.id)
     else:
         all_posts = sa.select(Post).order_by(Post.timestamp.desc()) # get all posts in descending order of time
         posts = db.paginate(all_posts, page=page,
@@ -289,7 +291,7 @@ def explore():
         prev_url = url_for('explore', page=posts.prev_num) \
             if posts.has_prev else None
 
-        return render_template('index.html', title='Explore',
+        return render_template('noticeboard.html', title='Explore',
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url, user_id = current_user.id)
 
@@ -321,17 +323,17 @@ def delete_post(post_id):
     post = Post.query.get_or_404(post_id) #query for the first matching result in db, otherwise return a 404 error
     if current_user.id != post.author.id and not current_user.access_level == 1:
         flash("You are not authorized to delete this post.", "danger")
-        return redirect(url_for('index'))
+        return redirect(url_for('noticeboard'))
     db.session.delete(post)
     db.session.commit()
     flash("Post deleted successfully.", "success")
     
-    return redirect(url_for('index'))
+    return redirect(url_for('noticeboard'))
 
 @app.route('/login', methods=['GET', 'POST']) #provides form and redirect to page user tried to access
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index')) # if user already logged in, redirect to index (home) page
+        return redirect(url_for('noticeboard')) # if user already logged in, redirect to noticeboard (home) page
     form = LoginForm() # if not logged in, provide a login form
     if form.validate_on_submit(): # if submitted with valid entries in the field
         user = db.session.scalar(
@@ -342,7 +344,7 @@ def login():
         login_user(user, remember=form.remember_me.data) # from Flask Login library, sets user session as “authenticated” so bypasses decorator “@alogin_required”
         next_page = request.args.get('next') #part of Flask Login,  next= page that was tryig to be accessed when not logged in
         if not next_page or urlsplit(next_page).netloc != '': #netloc secures the url to ensure hackers can’t redirect users to a malicious website
-            next_page = url_for('index') # if no next, then redirect to home page
+            next_page = url_for('noticeboard') # if no next, then redirect to home page
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form) # if form is invalid (required inputs missing) then refresh.
 
@@ -357,7 +359,7 @@ def logout():
 @app.route('/register', methods=['GET', 'POST']) #adds user to db
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index')) #don’t let logged in users try to re-register
+        return redirect(url_for('noticeboard')) #don’t let logged in users try to re-register
     form = RegistrationForm() #render form
     if form.validate_on_submit(): # if all required inputs given
         user = User(username=form.username.data, email=form.email.data) # create new user record
@@ -372,7 +374,7 @@ def register():
 @app.route('/reset_password_request', methods=['GET', 'POST']) #Let's user request a password reset by entering email from login page
 def reset_password_request():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('noticeboard'))
     form = ResetPasswordRequestForm()
     if form.validate_on_submit():
         user = db.session.scalar(sa.select(User).where(User.email == form.email.data)) # get first result from query for the user’s email
@@ -388,10 +390,10 @@ def reset_password_request():
 @app.route('/reset_password/<token>', methods=['GET', 'POST']) # Webpage to reset password using token from email
 def reset_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('noticeboard'))
     user = User.verify_reset_password_token(token) # give the user a time-limited token (preconfigured time such as 30min)
     if not user: # if token expired/invalid, redirect to home page
-        return redirect(url_for('index'))
+        return redirect(url_for('noticeboard'))
     form = ResetPasswordForm() # if the token is still valid, provide a form to reset password
     if form.validate_on_submit():
         user.set_password(form.password.data)
@@ -446,7 +448,7 @@ def follow(username):
             sa.select(User).where(User.username == username))
         if user is None:
             flash(f'User {username} not found.') #if no user to follow, flash message and redirect
-            return redirect(url_for('index'))
+            return redirect(url_for('noticeboard'))
         if user == current_user:
             flash('You cannot follow yourself!')
             return redirect(url_for('user', username=username))
@@ -455,7 +457,7 @@ def follow(username):
         flash(f'You are following {username}!')
         return redirect(url_for('user', username=username))
     else:
-        return redirect(url_for('index'))
+        return redirect(url_for('noticeboard'))
 
 
 @app.route('/unfollow/<username>', methods=['POST']) # allows unfollow of users
@@ -467,7 +469,7 @@ def unfollow(username):
             sa.select(User).where(User.username == username))
         if user is None: #Check if the user trying to be unfollowed exists
             flash(f'User {username} not found.')
-            return redirect(url_for('index'))
+            return redirect(url_for('noticeboard'))
         if user == current_user: #Check if user is trying to unfollow themselves
             flash('You cannot unfollow yourself!')
             return redirect(url_for('user', username=username))
@@ -476,7 +478,7 @@ def unfollow(username):
         flash(f'You are not following {username}.')
         return redirect(url_for('user', username=username))
     else:
-        return redirect(url_for('index'))
+        return redirect(url_for('noticeboard'))
 
 
 

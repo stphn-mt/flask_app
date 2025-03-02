@@ -1,4 +1,4 @@
-2025-02-22 22:48:03,228 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-23 22:51:28,757 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -12,111 +12,65 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 263, in explore
-    posts = db.paginate(search_results, page=page,
-                    per_page=app.config['POSTS_PER_PAGE'], error_out=False) # paginate posts, with descending order of time
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/extension.py", line 839, in paginate
-    return SelectPagination(
-        select=select,
-    ...<5 lines>...
-        count=count,
+  File "/Users/stephentrento/flask_app/app/routes.py", line 287, in explore
+    search_results = search_posts_and_users(user_asks) # filter the search for the query
+  File "/Users/stephentrento/flask_app/app/routes.py", line 317, in search_posts_and_users
+    user_posts = Post.query.filter(Post.author.in_([user.id for user in user_results])).all()
+                                   ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/operators.py", line 943, in in_
+    return self.operate(in_op, other)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/attributes.py", line 453, in operate
+    return op(self.comparator, *other, **kwargs)  # type: ignore[no-any-return]  # noqa: E501
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/operators.py", line 2146, in in_op
+    return a.in_(b)
+           ~~~~~^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/relationships.py", line 699, in in_
+    raise NotImplementedError(
+    ...<4 lines>...
     )
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
-    items = self._query_items()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 337, in _query_items
-    select = select.limit(self.per_page).offset(self._query_offset)
-             ^^^^^^^^^^^^
-AttributeError: 'list' object has no attribute 'limit'
-2025-02-22 22:49:08,040 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:49:14,623 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 263, in explore
-    posts = search_results[(page - 1) * per_page: page * per_page]
-                                        ^^^^^^^^
-NameError: name 'per_page' is not defined
-2025-02-22 22:50:11,666 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:50:22,609 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 263, in explore
-    posts = search_results[(page - 1) * app.config['POSTS_PER_PAGE'],: page * per_page]
-                                                                              ^^^^^^^^
-NameError: name 'per_page' is not defined
-2025-02-22 22:50:40,661 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:50:46,427 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:51:28,391 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:51:45,597 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:51:53,434 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 263, in explore
-    posts = search_results[(page - 1) * app.config['POSTS_PER_PAGE'],: page * per_page]
-                                                                              ^^^^^^^^
-NameError: name 'per_page' is not defined
-2025-02-22 22:52:16,910 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:52:23,057 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 277, in explore
-    posts=posts.items, next_url=next_url,
-          ^^^^^^^^^^^
-AttributeError: 'list' object has no attribute 'items'
-2025-02-22 22:53:36,444 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:54:45,722 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:54:58,618 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:55:27,219 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:56:13,575 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:57:26,034 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:09:04,200 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:29:23,154 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:33:55,166 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:39:41,354 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:41:10,134 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:41:45,768 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:48:49,451 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 23:56:21,570 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+NotImplementedError: in_() not yet supported for relationships.  For a simple many-to-one, use in_() against the set of foreign key values.
+2025-02-23 22:53:32,608 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 23:13:50,504 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 10:27:48,092 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 10:32:00,503 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 10:35:05,118 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:01:40,725 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:02:26,002 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:02:38,108 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:02:54,693 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:03:20,722 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:03:38,137 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:03:45,095 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:04:00,097 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:04:10,400 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 11:04:21,509 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 14:25:51,599 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 14:27:46,337 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-24 14:28:10,800 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-26 21:18:58,780 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-26 22:10:17,821 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 09:23:01,275 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 09:29:21,871 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 09:34:21,993 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 09:41:13,540 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 09:47:37,820 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 09:58:01,322 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 21:11:34,955 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 21:20:48,323 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 22:12:43,647 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 22:13:28,463 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 22:40:37,773 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-27 22:42:37,292 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-28 12:04:50,978 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-28 12:17:20,834 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-28 12:18:06,539 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-28 12:19:47,103 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 14:43:53,670 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 14:46:44,726 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 14:47:46,316 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 14:49:20,775 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 14:49:47,082 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 14:53:37,187 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 14:54:02,363 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-02 18:42:55,265 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

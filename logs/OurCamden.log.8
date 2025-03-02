@@ -1,4 +1,4 @@
-2025-02-20 11:05:24,638 ERROR: Exception on /reset_password/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNldF9wYXNzd29yZCI6OCwiZXhwIjoxNzQwMDUwMDk5LjA3ODQwNjh9.zCBNT3n07UZVt0a5bonW8OcPRKkIYAPp9s5Jv9PWYj4 [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-22 21:44:42,943 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -9,29 +9,14 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 330, in reset_password
-    return render_template('reset_password.html', form=form)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 149, in render_template
-    template = app.jinja_env.get_or_select_template(template_name_or_list)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1087, in get_or_select_template
-    return self.get_template(template_name_or_list, parent, globals)
-           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1016, in get_template
-    return self._load_template(name, globals)
-           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 975, in _load_template
-    template = self.loader.load(self, name, self.make_globals(globals))
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/loaders.py", line 126, in load
-    source, filename, uptodate = self.get_source(environment, name)
-                                 ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 65, in get_source
-    return self._get_source_fast(environment, template)
-           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 99, in _get_source_fast
-    raise TemplateNotFound(template)
-jinja2.exceptions.TemplateNotFound: reset_password.html
-2025-02-20 11:08:48,856 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 11:09:35,206 ERROR: Exception on /update_user/8 [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
+    search_results = Post.query.msearch(query, fields=['body', 'author'], limit=50).all() # filter the search for the query
+                                        ^^^^^
+NameError: name 'query' is not defined
+2025-02-22 21:46:18,944 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -42,11 +27,15 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 185, in update_user
-    setattr(user, data['field'], data['value'])  # Update dynamically
-                  ^^^^
-NameError: name 'data' is not defined
-2025-02-20 11:10:15,932 ERROR: Exception on /reset_password/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNldF9wYXNzd29yZCI6OCwiZXhwIjoxNzQwMDUwMzgxLjIwMDgxOX0.N2PQ2WihD-1ItnbfMEZ1riZ9Xyhecfm25b6hUvW3NCk [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
+    search_results = Post.query.msearch(query, fields=['body', 'author'], limit=50).all() # filter the search for the query
+                                        ^^^^^
+NameError: name 'query' is not defined
+2025-02-22 21:47:33,150 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 21:47:41,457 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -57,28 +46,40 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 330, in reset_password
-    return render_template('email/reset_password.html', form=form)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/stephentrento/flask_app/app/templates/email/reset_password.html", line 4, in top-level template code
-    <p>Dear {{ user.username }},</p>
-    ^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
-    return getattr(obj, attribute)
-jinja2.exceptions.UndefinedError: 'user' is undefined
-2025-02-20 11:19:16,075 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 11:34:55,066 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 11:39:13,826 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 11:40:21,162 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 11:40:25,656 ERROR: Exception on /reset_password_request [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
+    search_results = Post.query.msearch(user_asks, fields=['body', 'author'], limit=50).all() # filter the search for the query
+                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 239, in msearch
+    ix = _self.index(model)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 151, in index
+    self._indexs[name] = Index(
+                         ~~~~~^
+        model,
+        ^^^^^^
+    ...<3 lines>...
+        self.index_name,
+        ^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 85, in __init__
+    self._schema = Schema(self)
+                   ~~~~~~^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 28, in __init__
+    self.schema = _Schema(**self.fields)
+                            ^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 80, in fields
+    field_type = field_attr.property.columns[0].type
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1332, in __getattr__
+    return self._fallback_getattr(key)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1301, in _fallback_getattr
+    raise AttributeError(key)
+AttributeError: columns
+2025-02-22 21:47:49,072 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -89,31 +90,37 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 313, in reset_password_request
-    return render_template('reset_password_request.html',
-                           title='Reset Password', form=form) # refresh the page if incorrectly filled in form
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/stephentrento/flask_app/app/templates/reset_password_request.html", line 1, in top-level template code
-    {% extends "base.html" %}
-  File "/Users/stephentrento/flask_app/app/templates/base.html", line 82, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/reset_password_request.html", line 5, in block 'content'
-    {{ wtf.quick_form(form) }}
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 490, in getattr
-    return getattr(obj, attribute)
-jinja2.exceptions.UndefinedError: 'wtf' is undefined
-2025-02-20 11:41:03,476 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 13:28:30,356 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 13:29:56,306 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 13:31:32,492 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 13:31:55,308 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
+    search_results = Post.query.msearch(user_asks, fields=['body', 'author'], limit=50).all() # filter the search for the query
+                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 239, in msearch
+    ix = _self.index(model)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 151, in index
+    self._indexs[name] = Index(
+                         ~~~~~^
+        model,
+        ^^^^^^
+    ...<3 lines>...
+        self.index_name,
+        ^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 85, in __init__
+    self._schema = Schema(self)
+                   ~~~~~~^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 28, in __init__
+    self.schema = _Schema(**self.fields)
+                            ^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 80, in fields
+    field_type = field_attr.property.columns[0].type
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1332, in __getattr__
+    return self._fallback_getattr(key)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1301, in _fallback_getattr
+    raise AttributeError(key)
+AttributeError: columns
+2025-02-22 21:51:40,033 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

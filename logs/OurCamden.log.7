@@ -1,27 +1,4 @@
-2025-02-20 13:32:32,052 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 96, in map
-    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
-                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'AnonymousUserMixin' object has no attribute 'access_level'
-2025-02-20 13:35:43,207 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 13:36:58,322 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 14:45:30,777 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 14:51:42,002 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 15:01:09,572 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 15:01:38,363 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 23:56:25,049 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 23:56:29,370 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 23:56:35,598 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-22 21:52:01,339 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -35,39 +12,38 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 98, in map
-    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id, form2=form2)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/stephentrento/flask_app/app/templates/map.html", line 2, in top-level template code
-    {% import "bootstrap_wtf.html" as wtf %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/base.html", line 82, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/map.html", line 20, in block 'content'
-    <form id="modification-form" method="PUT" action="{{ url_for('update_marker') }}" style="display:none;">
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-        endpoint,
+  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
+    search_results = Post.query.msearch(user_asks, fields=['body', 'author'], limit=50).all() # filter the search for the query
+                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 239, in msearch
+    ix = _self.index(model)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 151, in index
+    self._indexs[name] = Index(
+                         ~~~~~^
+        model,
+        ^^^^^^
     ...<3 lines>...
-        force_external=_external,
+        self.index_name,
+        ^^^^^^^^^^^^^^^^
     )
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'update_marker'. Did you forget to specify values ['marker_id']?
-2025-02-20 23:56:56,314 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+    ^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 85, in __init__
+    self._schema = Schema(self)
+                   ~~~~~~^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 28, in __init__
+    self.schema = _Schema(**self.fields)
+                            ^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 80, in fields
+    field_type = field_attr.property.columns[0].type
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1332, in __getattr__
+    return self._fallback_getattr(key)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1301, in _fallback_getattr
+    raise AttributeError(key)
+AttributeError: columns
+2025-02-22 21:56:33,002 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 21:56:42,796 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -81,36 +57,68 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 98, in map
-    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id, form2=form2)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
-    return _render(app, template, context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
-    rv = template.render(context)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
-    self.environment.handle_exception()
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
-    raise rewrite_traceback_stack(source=source)
-  File "/Users/stephentrento/flask_app/app/templates/map.html", line 2, in top-level template code
-    {% import "bootstrap_wtf.html" as wtf %}
-    ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/base.html", line 82, in top-level template code
-    {% block content %}{% endblock %}
-    ^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/templates/map.html", line 20, in block 'content'
-    <form id="modification-form" method="PUT" action="{{ url_for('update_marker') }}" style="display:none;">
-    ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
-    return self.handle_url_build_error(error, endpoint, values)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
-    rv = url_adapter.build(  # type: ignore[union-attr]
-        endpoint,
-    ...<3 lines>...
-        force_external=_external,
+  File "/Users/stephentrento/flask_app/app/routes.py", line 262, in explore
+    posts = db.paginate(search_results, page=page,
+                    per_page=app.config['POSTS_PER_PAGE'], error_out=False) # paginate posts, with descending order of time
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/extension.py", line 839, in paginate
+    return SelectPagination(
+        select=select,
+    ...<5 lines>...
+        count=count,
     )
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
-    raise BuildError(endpoint, values, method, self)
-werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'update_marker'. Did you forget to specify values ['marker_id']?
-2025-02-20 23:57:28,792 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 337, in _query_items
+    select = select.limit(self.per_page).offset(self._query_offset)
+             ^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'limit'
+2025-02-22 21:57:10,418 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 21:57:17,910 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 262, in explore
+    posts = db.paginate(search_results, page=page,
+                    per_page=app.config['POSTS_PER_PAGE'], error_out=False) # paginate posts, with descending order of time
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/extension.py", line 839, in paginate
+    return SelectPagination(
+        select=select,
+    ...<5 lines>...
+        count=count,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 337, in _query_items
+    select = select.limit(self.per_page).offset(self._query_offset)
+             ^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'limit'
+2025-02-22 22:02:24,128 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 22:02:33,222 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 268, in explore
+    next_url = url_for('explore', page=page + 1) if page * per_page < total else None
+                                                                      ^^^^^
+UnboundLocalError: cannot access local variable 'total' where it is not associated with a value
+2025-02-22 22:47:53,930 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

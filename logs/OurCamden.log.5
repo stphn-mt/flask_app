@@ -1,4 +1,11 @@
-2025-02-22 21:44:42,943 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-22 23:56:29,563 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/base.py", line 2178, in _entity_namespace_key
+    return getattr(ns, key)  # type: ignore
+AttributeError: type object 'Post' has no attribute 'author_id'. Did you mean: 'author'?
+
+The above exception was the direct cause of the following exception:
+
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -12,11 +19,21 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
-    search_results = Post.query.msearch(query, fields=['body', 'author'], limit=50).all() # filter the search for the query
-                                        ^^^^^
-NameError: name 'query' is not defined
-2025-02-22 21:46:18,944 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/app/routes.py", line 259, in explore
+    search_results = search_posts_by_author(user_asks)
+  File "/Users/stephentrento/flask_app/app/routes.py", line 293, in search_posts_by_author
+    return Post.query.filter_by(author_id=author.id).all()
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/query.py", line 1987, in filter_by
+    _entity_namespace_key(from_entity, key) == value
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/sql/base.py", line 2180, in _entity_namespace_key
+    raise exc.InvalidRequestError(
+        'Entity namespace for "%s" has no property "%s"' % (entity, key)
+    ) from err
+sqlalchemy.exc.InvalidRequestError: Entity namespace for "post" has no property "author_id"
+2025-02-22 23:57:51,911 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 23:58:02,373 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -30,12 +47,12 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
-    search_results = Post.query.msearch(query, fields=['body', 'author'], limit=50).all() # filter the search for the query
-                                        ^^^^^
-NameError: name 'query' is not defined
-2025-02-22 21:47:33,150 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 21:47:41,457 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/app/routes.py", line 265, in explore
+    posts = db.paginate(all_posts, page=page,
+                        ^^^^^^^^^
+UnboundLocalError: cannot access local variable 'all_posts' where it is not associated with a value
+2025-02-22 23:58:46,266 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 23:58:53,800 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -49,37 +66,27 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
-    search_results = Post.query.msearch(user_asks, fields=['body', 'author'], limit=50).all() # filter the search for the query
-                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 239, in msearch
-    ix = _self.index(model)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 151, in index
-    self._indexs[name] = Index(
-                         ~~~~~^
-        model,
-        ^^^^^^
-    ...<3 lines>...
-        self.index_name,
-        ^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 265, in explore
+    posts = db.paginate(search_results, page=page,
+                    per_page=app.config['POSTS_PER_PAGE'], error_out=False) # paginate posts, with descending order of time
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/extension.py", line 839, in paginate
+    return SelectPagination(
+        select=select,
+    ...<5 lines>...
+        count=count,
     )
-    ^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 85, in __init__
-    self._schema = Schema(self)
-                   ~~~~~~^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 28, in __init__
-    self.schema = _Schema(**self.fields)
-                            ^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 80, in fields
-    field_type = field_attr.property.columns[0].type
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1332, in __getattr__
-    return self._fallback_getattr(key)
-           ~~~~~~~~~~~~~~~~~~~~~~^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1301, in _fallback_getattr
-    raise AttributeError(key)
-AttributeError: columns
-2025-02-22 21:47:49,072 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 337, in _query_items
+    select = select.limit(self.per_page).offset(self._query_offset)
+             ^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'limit'
+2025-02-23 20:29:42,993 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 20:29:57,544 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 20:30:17,617 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 20:30:55,702 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 20:31:33,411 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 20:32:40,042 ERROR: Exception on /update_user/1 [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -90,37 +97,23 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
-    search_results = Post.query.msearch(user_asks, fields=['body', 'author'], limit=50).all() # filter the search for the query
-                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 239, in msearch
-    ix = _self.index(model)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 151, in index
-    self._indexs[name] = Index(
-                         ~~~~~^
-        model,
-        ^^^^^^
-    ...<3 lines>...
-        self.index_name,
-        ^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 85, in __init__
-    self._schema = Schema(self)
-                   ~~~~~~^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 28, in __init__
-    self.schema = _Schema(**self.fields)
-                            ^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 80, in fields
-    field_type = field_attr.property.columns[0].type
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1332, in __getattr__
-    return self._fallback_getattr(key)
-           ~~~~~~~~~~~~~~~~~~~~~~^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1301, in _fallback_getattr
-    raise AttributeError(key)
-AttributeError: columns
-2025-02-22 21:51:40,033 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+  File "/Users/stephentrento/flask_app/app/routes.py", line 192, in update_user
+    setattr(user, data['field'], data['value'])  # Update dynamically
+                  ^^^^
+NameError: name 'data' is not defined
+2025-02-23 20:34:00,974 ERROR: Exception on /update_user/1 [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 192, in update_user
+    setattr(user, data['field'], data['value'])  # Update dynamically
+                  ^^^^
+NameError: name 'data' is not defined
+2025-02-23 20:39:27,242 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

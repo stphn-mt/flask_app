@@ -1,4 +1,4 @@
-2025-02-19 23:44:33,570 ERROR: Exception on /register [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-20 23:57:34,217 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -9,29 +9,65 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 291, in register
-    if form.validate_on_submit(): # if all required inputs given
-       ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_wtf/form.py", line 86, in validate_on_submit
-    return self.is_submitted() and self.validate(extra_validators=extra_validators)
-                                   ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/form.py", line 330, in validate
-    return super().validate(extra)
-           ~~~~~~~~~~~~~~~~^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/form.py", line 147, in validate
-    if not field.validate(self, extra):
-           ~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/fields/core.py", line 234, in validate
-    stop_validation = self._run_validation_chain(form, chain)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/fields/core.py", line 254, in _run_validation_chain
-    validator(form, self)
-    ~~~~~~~~~^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/forms.py", line 35, in is_strong_password
-    flash('Password must be atleast 8 characters')
-    ^^^^^
-NameError: name 'flash' is not defined. Did you mean: 'hash'?
-2025-02-19 23:46:37,216 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-19 23:47:19,962 ERROR: Exception on /register [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 98, in map
+    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id, form2=form2)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/templating.py", line 131, in _render
+    rv = template.render(context)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/jinja2/environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "/Users/stephentrento/flask_app/app/templates/map.html", line 2, in top-level template code
+    {% import "bootstrap_wtf.html" as wtf %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/base.html", line 82, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/templates/map.html", line 20, in block 'content'
+    <form id="modification-form" method="PUT" action="{{ url_for('update_marker') }}" style="display:none;">
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/werkzeug/routing/map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'update_marker'. Did you forget to specify values ['marker_id']?
+2025-02-21 00:03:41,021 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:06:16,078 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:07:28,378 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:20:19,664 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:21:00,066 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:23:29,224 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:24:30,003 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:28:57,153 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:29:18,583 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:36:10,983 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:37:31,128 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:38:41,362 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:39:21,948 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:40:53,519 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:43:25,633 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:43:41,112 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:43:46,579 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:46:26,718 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:48:38,484 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:50:42,957 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-21 00:59:20,873 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 11:13:05,524 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 21:30:47,133 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 21:31:01,013 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -42,38 +78,15 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 291, in register
-    if form.validate_on_submit(): # if all required inputs given
-       ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_wtf/form.py", line 86, in validate_on_submit
-    return self.is_submitted() and self.validate(extra_validators=extra_validators)
-                                   ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/form.py", line 330, in validate
-    return super().validate(extra)
-           ~~~~~~~~~~~~~~~~^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/form.py", line 147, in validate
-    if not field.validate(self, extra):
-           ~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/fields/core.py", line 234, in validate
-    stop_validation = self._run_validation_chain(form, chain)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/wtforms/fields/core.py", line 254, in _run_validation_chain
-    validator(form, self)
-    ~~~~~~~~~^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/forms.py", line 36, in is_strong_password
-    elif not re.search("[a-z]", password.data):
-             ^^
-NameError: name 're' is not defined. Did you forget to import 're'?
-2025-02-19 23:47:34,834 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:00:18,943 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:01:07,530 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:04:13,157 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:11:10,814 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:14:10,365 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:14:28,438 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:17:48,559 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 00:19:29,708 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 08:55:41,841 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 10:04:07,074 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 264, in explore
+    posts = current_user.following_posts().paginate(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Select' object has no attribute 'paginate'
+2025-02-22 21:31:51,302 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-22 21:31:53,812 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -84,39 +97,11 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 96, in map
-    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
-                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'AnonymousUserMixin' object has no attribute 'access_level'
-2025-02-20 10:31:28,709 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 10:31:45,468 ERROR: Exception on /map [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 96, in map
-    return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id)
-                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'AnonymousUserMixin' object has no attribute 'access_level'
-2025-02-20 11:04:18,310 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-20 11:04:53,318 ERROR: Exception on /update_user/8 [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 185, in update_user
-    setattr(user, data['field'], data['value'])  # Update dynamically
-                  ^^^^
-NameError: name 'data' is not defined
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 264, in explore
+    posts = current_user.following_posts().paginate(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Select' object has no attribute 'paginate'
+2025-02-22 21:44:33,325 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]

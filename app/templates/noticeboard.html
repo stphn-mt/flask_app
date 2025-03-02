@@ -4,6 +4,7 @@
 {% block content %}
     {% if title == "Explore" %}
         <h1>Hi, {{ current_user.username }}!</h1>
+        <p>Find new people and events here! See what other people are posting, and follow them to have their posts appear on your noticeboard.</p>
         <h4>Search</h4>
         <form class="form-inline" method="GET" action="{{ url_for('explore') }}">
             <div class="form-group">
@@ -12,6 +13,8 @@
             </div>
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
+    {% elif title == "Noticeboard" %}
+        <p> Here are the posts from people you're following:</p>
     {% endif %}
 
     {% if form %}

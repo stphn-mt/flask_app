@@ -5,6 +5,10 @@ Map
 {% endblock %}
 
 {% block content %}
+    <p>Welcome! This website allows you to see local clubs, support programs and other community events happening in the St Pancras ad Somers Town area.</p>
+    {% if not user_id %}
+    <p>Sign up to get updates from your favourite organisers, and to share your own events with the community!</p>
+    {% endif %}
     <h4>Search</h4>
         <form class="form-inline" method="GET" action="/api/markers">
             <div class="form-group">
@@ -16,22 +20,30 @@ Map
 
     <div id="map" style="width:900px; height:580px; "></div>
     <br>
-    <!-- Form that will be shown after a map click -->
-    <form id="modification-form" method="POST" action="{{ url_for('update_marker') }}" style="display:none;">
-        <h4>Edit event</h4>
-        {{ wtf.quick_form(form2) }}
-    </form>
-
+    <!-- Form that will be shown after a map click, if the user is logged in -->
+    {% if form2 %}
+        <form id="modification-form" method="POST" action="{{ url_for('update_marker') }}" style="display:none;">
+            <h4>Edit event</h4>
+            {{ wtf.quick_form(form2) }}
+        </form>
+    {% endif %}
+    {% if form %}
     <form id="form-container" method="POST" action="{{ url_for('map') }}" style="display:block;">
         <h4>Create a new event</h4>
         {{ wtf.quick_form(form) }}
     </form>
-
+    {% endif %}
     <!-- define info about current user needed for javascript -->
+     <script>
+        const thisUserId = 1000000000000000
+        const thisUserAccessLv = 0
+     </script>
+    {% if user_id and user_access_level %}
     <script>
         const thisUserId = {{ user_id|tojson }}; // Extract user id 
         const thisUserAccessLv = {{ user_access_level|tojson }}; // Extract user access level 
     </script>
+    {% endif %}
     <script src="../static/leaf.js"></script>
     <br>
     <br>

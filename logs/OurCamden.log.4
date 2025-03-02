@@ -1,4 +1,47 @@
-2025-02-22 21:52:01,339 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+2025-02-23 20:39:44,512 ERROR: Exception on /delete_user/3 [DELETE] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/app/routes.py", line 203, in delete_user
+    search.update_index()
+    ~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 177, in update_index
+    return self.create_index(model, update=True, yield_per=yield_per)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 149, in create_index
+    return self.create_all_index(update, delete)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 159, in create_all_index
+    self.create_index(m, update, delete, yield_per)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 153, in create_index
+    self.create_one_index(instance, update, delete, False)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 189, in create_one_index
+    ix.update(**attrs)
+    ~~~~~~~~~^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 117, in update
+    return self._writer.update_document(**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/whoosh/writing.py", line 490, in update_document
+    self.add_document(**fields)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/whoosh/writing.py", line 730, in add_document
+    self._check_fields(schema, fieldnames)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/whoosh/writing.py", line 717, in _check_fields
+    raise UnknownFieldError("No field named %r in %s"
+                            % (name, schema))
+whoosh.fields.UnknownFieldError: No field named 'user_id' in <Schema: ['body', 'id']>
+2025-02-23 20:48:49,817 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 20:49:36,895 ERROR: Exception on /index [POST] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -12,38 +55,51 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 261, in explore
-    search_results = Post.query.msearch(user_asks, fields=['body', 'author'], limit=50).all() # filter the search for the query
-                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 239, in msearch
-    ix = _self.index(model)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 151, in index
-    self._indexs[name] = Index(
-                         ~~~~~^
-        model,
-        ^^^^^^
-    ...<3 lines>...
-        self.index_name,
-        ^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 85, in __init__
-    self._schema = Schema(self)
-                   ~~~~~~^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 28, in __init__
-    self.schema = _Schema(**self.fields)
-                            ^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 80, in fields
-    field_type = field_attr.property.columns[0].type
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1332, in __getattr__
-    return self._fallback_getattr(key)
-           ~~~~~~~~~~~~~~~~~~~~~~^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/util/langhelpers.py", line 1301, in _fallback_getattr
-    raise AttributeError(key)
-AttributeError: columns
-2025-02-22 21:56:33,002 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 21:56:42,796 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
+  File "/Users/stephentrento/flask_app/app/routes.py", line 266, in index
+    db.session.commit() #commit to db
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/scoping.py", line 599, in commit
+    return self._proxied.commit()
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2032, in commit
+    trans.commit(_to_root=True)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "<string>", line 2, in commit
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/state_changes.py", line 139, in _go
+    ret_value = fn(self, *arg, **kw)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 1323, in commit
+    self.session.dispatch.after_commit(self.session)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/sqlalchemy/event/attr.py", line 378, in __call__
+    fn(*args, **kw)
+    ~~^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/track_modifications.py", line 83, in _after_commit
+    models_committed.send(app, changes=changes)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/blinker/base.py", line 249, in send
+    result = receiver(sender, **kwargs)
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/backends.py", line 125, in index_signal
+    return self._signal(self, sender, changes)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/signal.py", line 32, in default_signal
+    backend.create_one_index(instance)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 192, in create_one_index
+    ix.create(**attrs)
+    ~~~~~~~~~^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_msearch/whoosh_backend.py", line 112, in create
+    return self._writer.add_document(**kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/whoosh/writing.py", line 730, in add_document
+    self._check_fields(schema, fieldnames)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/whoosh/writing.py", line 717, in _check_fields
+    raise UnknownFieldError("No field named %r in %s"
+                            % (name, schema))
+whoosh.fields.UnknownFieldError: No field named 'user_id' in <Schema: ['body', 'id']>
+2025-02-23 20:51:01,380 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 22:50:19,974 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-02-23 22:50:30,517 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
 Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
     response = self.full_dispatch_request()
@@ -57,68 +113,10 @@ Traceback (most recent call last):
   File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
     return current_app.ensure_sync(func)(*args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 262, in explore
-    posts = db.paginate(search_results, page=page,
-                    per_page=app.config['POSTS_PER_PAGE'], error_out=False) # paginate posts, with descending order of time
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/extension.py", line 839, in paginate
-    return SelectPagination(
-        select=select,
-    ...<5 lines>...
-        count=count,
-    )
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
-    items = self._query_items()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 337, in _query_items
-    select = select.limit(self.per_page).offset(self._query_offset)
-             ^^^^^^^^^^^^
-AttributeError: 'list' object has no attribute 'limit'
-2025-02-22 21:57:10,418 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 21:57:17,910 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 262, in explore
-    posts = db.paginate(search_results, page=page,
-                    per_page=app.config['POSTS_PER_PAGE'], error_out=False) # paginate posts, with descending order of time
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/extension.py", line 839, in paginate
-    return SelectPagination(
-        select=select,
-    ...<5 lines>...
-        count=count,
-    )
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
-    items = self._query_items()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_sqlalchemy/pagination.py", line 337, in _query_items
-    select = select.limit(self.per_page).offset(self._query_offset)
-             ^^^^^^^^^^^^
-AttributeError: 'list' object has no attribute 'limit'
-2025-02-22 22:02:24,128 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
-2025-02-22 22:02:33,222 ERROR: Exception on /explore [GET] [in /Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py:875]
-Traceback (most recent call last):
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/.venv/lib/python3.13/site-packages/flask_login/utils.py", line 290, in decorated_view
-    return current_app.ensure_sync(func)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "/Users/stephentrento/flask_app/app/routes.py", line 268, in explore
-    next_url = url_for('explore', page=page + 1) if page * per_page < total else None
-                                                                      ^^^^^
-UnboundLocalError: cannot access local variable 'total' where it is not associated with a value
-2025-02-22 22:47:53,930 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+  File "/Users/stephentrento/flask_app/app/routes.py", line 287, in explore
+    search_results = search_posts_and_users(user_asks) # filter the search for the query
+  File "/Users/stephentrento/flask_app/app/routes.py", line 317, in search_posts_and_users
+    user_posts = Post.query.filter(Post.author_id.in_([user.id for user in user_results])).all()
+                                   ^^^^^^^^^^^^^^
+AttributeError: type object 'Post' has no attribute 'author_id'. Did you mean: 'author'?
+2025-02-23 22:51:19,686 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
