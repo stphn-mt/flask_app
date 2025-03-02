@@ -34,16 +34,15 @@ Map
     </form>
     {% endif %}
     <!-- define info about current user needed for javascript -->
-     <script>
-        const thisUserId = 1000000000000000
-        const thisUserAccessLv = 0
-     </script>
-    {% if user_id and user_access_level %}
     <script>
-        const thisUserId = {{ user_id|tojson }}; // Extract user id 
-        const thisUserAccessLv = {{ user_access_level|tojson }}; // Extract user access level 
+        let thisUserId = 0;
+        let thisUserAccessLv = 0;
+        
+        {% if user_id and user_access_level %}
+            thisUserId = {{ user_id|tojson }};
+            thisUserAccessLv = {{ user_access_level|tojson }};
+        {% endif %}
     </script>
-    {% endif %}
     <script src="../static/leaf.js"></script>
     <br>
     <br>

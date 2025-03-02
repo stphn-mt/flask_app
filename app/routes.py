@@ -46,7 +46,7 @@ def get_coordinates(postcode):# Fetch latitude and longitude from Postcodes.io
     return None, None  # Return None if invalid postcode
 
 
-@app.route('/map', methods = ["GET", "POST"]) #handle map and creating/modifying markers
+@app.route('/', methods = ["GET", "POST"]) #handle map and creating/modifying markers
 def map():
     form = EventForm()
     form2 = ModifyEventForm()
@@ -98,7 +98,7 @@ def map():
         flash('You have reached the maximum number of markers allowed today.', 'danger')
     return render_template('map.html', form=form, user_access_level=current_user.access_level, user_id=current_user.id, form2=form2)
 
-# transfer db marker data to /map and display all prev stored markers
+# transfer db marker data to / and display all prev stored markers
 
 @app.route('/api/markers') # handle rendering correct markers based on search-filter or no search-filter
 def api_markers():
