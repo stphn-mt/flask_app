@@ -44,6 +44,12 @@ class RegistrationForm(FlaskForm):
     def validate_email(self, email):
         user = db.session.scalar(sa.select(User).where(
             User.email == email.data)) #same check as above
+        allowed_chars = [".", "@", "_", "-"]
+        tempstring = email.data
+        for char in allowed_chars:
+            tempstring = tempstring.replace(char, "")
+        if tempstring.isalnum() == False:
+            raise ValidationError('Email uses invalid characters.')
         if user is not None:
             raise ValidationError('Please use a different email address.')
 

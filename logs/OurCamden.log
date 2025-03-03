@@ -21,3 +21,57 @@ AttributeError: 'AnonymousUserMixin' object has no attribute 'id'
 2025-03-02 20:19:52,173 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
 2025-03-02 20:21:36,278 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
 2025-03-02 20:26:57,605 INFO: Our Camden startup [in /Users/stephentrento/flask_app/app/__init__.py:51]
+2025-03-03 08:11:08,710 INFO: Our Camden startup [in /Users/stephentrento/flask_app-1/app/__init__.py:51]
+2025-03-03 22:33:39,681 INFO: Our Camden startup [in /Users/stephentrento/flask_app-1/app/__init__.py:51]
+2025-03-03 22:34:26,940 ERROR: Exception on /delete_user/5 [DELETE] [in /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app-1/app/routes.py", line 195, in delete_user
+    search.update_noticeboard()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask_msearch/__init__.py", line 40, in __getattr__
+    return getattr(self._backend, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WhooshSearch' object has no attribute 'update_noticeboard'
+2025-03-03 22:34:29,528 ERROR: Exception on /delete_user/5 [DELETE] [in /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 3538, in delete
+    state = attributes.instance_state(instance)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute '_sa_instance_state'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/stephentrento/flask_app-1/app/routes.py", line 193, in delete_user
+    db.session.delete(user)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/sqlalchemy/orm/scoping.py", line 674, in delete
+    return self._proxied.delete(instance)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 3540, in delete
+    raise exc.UnmappedInstanceError(instance) from err
+sqlalchemy.orm.exc.UnmappedInstanceError: Class 'builtins.NoneType' is not mapped
+2025-03-03 22:46:19,849 INFO: Our Camden startup [in /Users/stephentrento/flask_app-1/app/__init__.py:51]

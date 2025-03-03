@@ -192,8 +192,7 @@ def delete_user(user_id):
     user = User.query.get(user_id)
     db.session.delete(user)
     db.session.commit()
-    search.update_noticeboard()
-    search.update_noticeboard(User)
+    search.update_index(User)
     return jsonify({'status': 'deleted'})
 
 
